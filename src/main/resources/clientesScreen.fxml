@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<StackPane fx:id="stackPane" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.clientesController">
+    <children>
+        <BorderPane prefHeight="600.0" prefWidth="1000.0">
+            <center>
+                <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <columns>
+                        <TableColumn fx:id="idCol" prefWidth="34.0" text="ID" />
+                        <TableColumn fx:id="nomeCol" prefWidth="320.00000381469727" text="NOME" />
+                        <TableColumn fx:id="endCol" prefWidth="424.0" text="ENDEREÇO" />
+                        <TableColumn fx:id="telCol" prefWidth="221.0" text="TELEFONE" />
+                    </columns>
+                    <BorderPane.margin>
+                        <Insets />
+                    </BorderPane.margin>
+                </TableView>
+            </center>
+            <top>
+                <VBox spacing="5.0" BorderPane.alignment="CENTER">
+                    <children>
+                  <HBox spacing="10.0" style="-fx-alignment: BETWEEN;" VBox.vgrow="NEVER">
+                     <children>
+                        <HBox prefHeight="80.0" prefWidth="724.0">
+                           <children>
+                              <VBox alignment="CENTER" prefHeight="88.0" prefWidth="568.0" style="-fx-border-color: NAVY; -fx-border-radius: 15; -fx-border-width: 2.5;">
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="FERRAMENTAS">
+                                       <font>
+                                          <Font size="20.0" />
+                                       </font>
+                                    </Text>
+                                          <HBox prefHeight="36.0" prefWidth="423.0" spacing="5.0">
+                                              <children>
+                                                  <JFXButton fx:id="btnEditar" alignment="CENTER" prefHeight="36.0" prefWidth="95.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: BLACK; -fx-border-radius: 15;" text="EDITAR" textAlignment="CENTER">
+                                                      <font>
+                                                          <Font size="14.0" />
+                                                      </font>
+                                                      <graphic>
+                                                          <FontAwesomeIconView glyphName="PENCIL" size="25" wrappingWidth="18.214284896850586" />
+                                                      </graphic>
+                                                  </JFXButton>
+                                                  <JFXButton fx:id="btnExcluir" alignment="CENTER" prefHeight="36.0" prefWidth="103.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: BLACK; -fx-border-radius: 15;" text="EXCLUIR" textAlignment="CENTER">
+                                                      <font>
+                                                          <Font size="14.0" />
+                                                      </font>
+                                                      <graphic>
+                                                          <FontAwesomeIconView glyphName="TRASH" size="25" wrappingWidth="17.214284896850586" />
+                                                      </graphic>
+                                                  </JFXButton>
+                                          <JFXButton fx:id="btnDetalhes" alignment="CENTER" prefHeight="36.0" prefWidth="192.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: BLACK; -fx-border-radius: 15;" text="PEDIDOS DO CLIENTE" textAlignment="CENTER">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <graphic>
+                                                <FontAwesomeIconView glyphName="INFO" size="25" wrappingWidth="13.214284896850586" />
+                                             </graphic>
+                                          </JFXButton>
+                                          <JFXButton fx:id="btnImport" alignment="CENTER" prefHeight="38.0" prefWidth="128.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: BLACK; -fx-border-radius: 15;" text="IMPORTAR" textAlignment="CENTER" HBox.hgrow="NEVER">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <graphic>
+                                                <FontAwesomeIconView glyphName="DOWNLOAD" size="25" wrappingWidth="23.214284896850586" />
+                                             </graphic>
+                                          </JFXButton>
+                                              </children>
+                                          </HBox>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <VBox alignment="CENTER" prefHeight="80.0" prefWidth="251.0" style="-fx-background-color: NAVY; -fx-background-radius: 15;">
+                           <children>
+                              <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="EXPORTAR">
+                                 <font>
+                                    <Font size="20.0" />
+                                 </font>
+                              </Text>
+                              <HBox spacing="5.0">
+                                 <children>
+                                    <JFXButton fx:id="btnPrintClientes" alignment="CENTER" prefHeight="36.0" prefWidth="106.0" style="-fx-background-color: white;" text="SALVAR" textAlignment="CENTER">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="SAVE" size="25" wrappingWidth="27.214284896850586" />
+                                       </graphic>
+                                    </JFXButton>
+                                    <JFXButton fx:id="btnPrintClientes1" alignment="CENTER" prefHeight="36.0" prefWidth="120.0" style="-fx-background-color: white;" text="IMPRIMIR" textAlignment="CENTER">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="PRINT" size="25" wrappingWidth="27.214284896850586" />
+                                       </graphic>
+                                    </JFXButton>
+                                 </children>
+                              </HBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <VBox alignment="CENTER" style="-fx-border-color: NAVY; -fx-border-radius: 15; -fx-border-width: 2.5;">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="BUSCA">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
+                              <HBox spacing="5.0">
+                                  <children>
+                                      <JFXTextField fx:id="edtSearch" prefHeight="40.0" prefWidth="899.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: BLACK; -fx-border-radius: 15;" />
+                                      <JFXButton fx:id="btnSearch" alignment="CENTER" contentDisplay="CENTER" prefHeight="40.0" prefWidth="78.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: BLACK; -fx-border-radius: 15;" text=" " textAlignment="CENTER">
+                                          <font>
+                                              <Font size="1.0" />
+                                          </font>
+                                          <graphic>
+                                              <FontAwesomeIconView glyphName="SEARCH" size="25" wrappingWidth="25.214284896850586" />
+                                          </graphic>
+                                      </JFXButton>
+                                  </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                              </HBox>
+                     </children>
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding>
+                  </VBox>
+                    </children>
+                    <BorderPane.margin>
+                        <Insets bottom="15.0" left="5.0" right="5.0" top="15.0" />
+                    </BorderPane.margin>
+                </VBox>
+            </top>
+        </BorderPane>
+    </children>
+</StackPane>
