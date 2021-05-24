@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<AnchorPane  prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.edtClienteAlert">
+   <children>
+      <VBox alignment="TOP_CENTER" layoutY="-5.0" prefHeight="410.0" prefWidth="600.0" spacing="5.0">
+         <children>
+            <HBox spacing="10.0">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="49.0" prefWidth="425.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="NOME">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Text>
+                        <JFXTextField fx:id="edtNome" style="-fx-background-color: lightgrey;" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="TELEFONE">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Text>
+                        <JFXTextField fx:id="edtTelefone" style="-fx-background-color: lightgrey;" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <VBox alignment="CENTER">
+               <children>
+                  <Separator prefWidth="200.0" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="ENDEREÇO">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Text>
+                  <JFXTextField fx:id="edtEndereco" style="-fx-background-color: lightgrey;" />
+               </children>
+            </VBox>
+            <Separator prefWidth="200.0" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="ULTIMOS PEDIDOS">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Text>
+            <TableView fx:id="tableViewClientePedidos" prefHeight="289.0" prefWidth="580.0">
+              <columns>
+                <TableColumn fx:id="idPedidoCol" prefWidth="23.0" text="ID" />
+                <TableColumn fx:id="atentendentePedidoCol" prefWidth="100.0" text="ATENDENTE" />
+                  <TableColumn fx:id="entregadorPedidoCol" prefWidth="101.0" text="ENTREGADOR" />
+                  <TableColumn fx:id="dataPCol" prefWidth="107.0" text="DATA PEDIDO" />
+                  <TableColumn fx:id="dataTCol" prefWidth="113.0" text="DATA TRIAGEM" />
+                  <TableColumn fx:id="dataFCol" prefWidth="135.0" text="DATA FINALIZAÇÃO" />
+              </columns>
+            </TableView>
+            <HBox alignment="CENTER_RIGHT" nodeOrientation="LEFT_TO_RIGHT" prefHeight="27.0" prefWidth="348.0" spacing="5.0">
+               <children>
+                  <JFXButton fx:id="btnSalvar" style="-fx-background-color: LIGHTGREY;" text="SALVAR ALTERAÇÕES" />
+                  <JFXButton fx:id="btnCancelar" style="-fx-background-color: LIGHTGREY;" text="CANCELAR" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>
