@@ -92,7 +92,7 @@ public class DataManagerAnalytcs {
 
     private static boolean recuperarQtdPedidos(ArrayList<String> arrayDatas, int qtdDias) {
         String query;
-        query = "SELECT * FROM `Ordem_De_Pedido_Finalizado` WHERE `data_entrada` =?";
+        query = "SELECT * FROM `Pedidos` WHERE `data_entrada` =?";
         boolean isFinalizado = false;
         for (int i = 0; i < qtdDias; i++) {
             try {
