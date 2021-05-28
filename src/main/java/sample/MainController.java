@@ -18,6 +18,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -134,6 +135,8 @@ public class MainController implements Initializable {
 
     @FXML
     private TableColumn<OrdemPedido, String> statusColFinalizado;
+
+
 
 
     //Table Finalizado

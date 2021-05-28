@@ -406,7 +406,7 @@ public class produtosController implements Initializable {
                 boolean state = db_crud.metodoEditarProduto(produto.getId(), edtNome.getText().toUpperCase().trim());
                 if(state == true){
                     dialog.close();
-                    refreshTable();
+                    //refreshTable();
                 }else{
                     JFXDialog dialog = AlertDialogModel.alertDialogErro("Houve um problema ao editar o produto.", stackPane);
                     dialog.show();

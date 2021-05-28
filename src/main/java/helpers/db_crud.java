@@ -53,16 +53,18 @@ public class db_crud {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, produto_nome);
             preparedStatement.setInt(2, produto_id);
-            state = preparedStatement.execute();
-            if (state) {
-                System.out.println("Problema no Update");
-            } else if (!(state)) {
+            int count = preparedStatement.executeUpdate();
+            if (count > 0) {
                 System.out.println("Update OK");
+                state = true;
+            }else{
+                System.out.println("Problema no Update");
+                state = false;
             }
         }catch (SQLException e){
             e.printStackTrace();
         }
-        return !state;
+        return state;
     }
     public static boolean metodoInsertPedido(OrdemPedido pedido, String query) {
         boolean insert = false;

@@ -21,6 +21,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -74,6 +75,12 @@ public class novoPedidoController implements Initializable {
 
     @FXML
     private JFXButton btnSalvar;
+
+    @FXML
+    private CheckBox checkBoxManual;
+
+    @FXML
+    private HBox hboxManual;
 
     @FXML
     private JFXButton btnClientePesquisa;
@@ -166,6 +173,13 @@ public class novoPedidoController implements Initializable {
         }));
          */
         setupEdt();
+        checkBoxManual.setOnMouseClicked((e) -> {
+            if(checkBoxManual.isSelected()){
+                hboxManual.setVisible(true);
+            }else{
+                hboxManual.setVisible(false);
+            }
+        });
 
 
         edtEndereco.setOnKeyPressed((e) -> {
@@ -384,6 +398,11 @@ public class novoPedidoController implements Initializable {
         }else{
             insertPedido();
         }
+    }
+
+
+    private void verificarCheckboxManual (){
+
     }
 
     private void insertPedido() {
