@@ -1,10 +1,7 @@
 package sample;
 
 import com.jfoenix.controls.*;
-import helpers.AlertDialogModel;
-import helpers.AuthenticationSystem;
-import helpers.db_connect;
-import helpers.db_crud;
+import helpers.*;
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -36,13 +33,19 @@ import models.Usuario;
 import java.net.URL;
 import java.sql.*;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static helpers.DataManagerAnalytcs.createEstatistica;
 
 public class novoPedidoController implements Initializable {
 
@@ -80,6 +83,34 @@ public class novoPedidoController implements Initializable {
     private CheckBox checkBoxManual;
 
     @FXML
+    private JFXDatePicker datePickerEntrada;
+
+    @FXML
+    private JFXTimePicker timePickerEntrada;
+
+    @FXML
+    private JFXTimePicker timePickerTriagem;
+
+    @FXML
+    private JFXTimePicker timePickerCheckout;
+
+    @FXML
+    private JFXTimePicker timePickerSaida;
+
+    @FXML
+    private JFXTimePicker timePickerFinalizado;
+
+    @FXML
+    private JFXTextField edtCaixa;
+
+    @FXML
+    private JFXTextField edtEntregador;
+
+    @FXML
+    private JFXComboBox cbStatus;
+
+
+    @FXML
     private HBox hboxManual;
 
     @FXML
@@ -110,6 +141,7 @@ public class novoPedidoController implements Initializable {
     int clienteid;
     double troco;
     int id;
+    String dataAtual;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -289,11 +321,75 @@ public class novoPedidoController implements Initializable {
         edtFonte.setOnKeyPressed((e) -> {
             switch (e.getCode()){
                 case ENTER:
-                    btnSalvar.requestFocus();
+                    if(checkBoxManual.isSelected()){
+                        timePickerEntrada.requestFocus();
+                    }else{
+                        btnSalvar.requestFocus();
+                    }
                     break;
             }
         });
 
+        datePickerEntrada.setValue(nowOnDate());
+        timePickerEntrada.setValue(nowOnTime());
+        timePickerEntrada.setOnKeyPressed((e) -> {
+            switch (e.getCode()){
+                case ENTER:
+                    timePickerCheckout.requestFocus();
+                    break;
+            }
+        });
+
+        timePickerCheckout.setValue(nowOnTime());
+        timePickerCheckout.setOnKeyPressed((e) -> {
+            switch (e.getCode()){
+                case ENTER:
+                    timePickerTriagem.requestFocus();
+                    break;
+            }
+        });
+
+        timePickerTriagem.setValue(nowOnTime());
+        timePickerTriagem.setOnKeyPressed((e) -> {
+            switch (e.getCode()){
+                case ENTER:
+                    timePickerSaida.requestFocus();
+                    break;
+            }
+        });
+
+        timePickerSaida.setValue(nowOnTime());
+        timePickerSaida.setOnKeyPressed((e) -> {
+            switch (e.getCode()){
+                case ENTER:
+                    timePickerFinalizado.requestFocus();
+                    break;
+            }
+        });
+
+        timePickerFinalizado.setValue(nowOnTime());
+        timePickerFinalizado.setOnKeyPressed((e) -> {
+            switch (e.getCode()){
+                case ENTER:
+                    edtCaixa.requestFocus();
+                    break;
+            }
+        });
+
+        edtCaixa.setOnKeyPressed((e) -> {
+            switch (e.getCode()){
+                case ENTER:
+                    edtEntregador.requestFocus();
+                    break;
+            }
+        });
+        edtEntregador.setOnKeyPressed((e) -> {
+            switch (e.getCode()){
+                case ENTER:
+                    btnSalvar.requestFocus();
+                    break;
+            }
+        });
         btnCancelar.setOnAction((e) -> {
             fecharJanela();
         });
@@ -389,21 +485,112 @@ public class novoPedidoController implements Initializable {
         if(edtTroco.getText() != null && !(edtTroco.getText().isEmpty())){
             troco = Double.parseDouble(edtTroco.getText());
         }
+        if (checkBoxManual.isSelected() == false) {
+            if(clienteNome.isEmpty() || clienteEndereco.isEmpty() || clienteTelefone.isEmpty() ||
+                    formaEntrega.isEmpty() || formaPagamento.isEmpty() || casoFalta.isEmpty() || fonte.isEmpty()){
+                alertDialogErro("Preencha todos os Campos!");
+            }else if(clienteNome.length() > 155 || clienteEndereco.length() > 500 || clienteTelefone.length() > 55 ){
+                alertDialogErro("Os campos excedem o tamanho de maximo de caracteres.");
+            }else{
+                verificarCheckboxManual();
+            }
+        }else{
+            if(clienteNome.isEmpty() || clienteEndereco.isEmpty() || clienteTelefone.isEmpty() ||
+                    formaEntrega.isEmpty() || formaPagamento.isEmpty() || casoFalta.isEmpty() || fonte.isEmpty()
+            || timePickerEntrada.getPromptText().isEmpty()|| timePickerTriagem.getPromptText().isEmpty() || timePickerCheckout.getPromptText().isEmpty()
+            || timePickerSaida.getPromptText().isEmpty() || timePickerFinalizado.getPromptText().isEmpty() || edtCaixa.getText().isEmpty()
+                    || edtEntregador.getText().isEmpty()){
+                alertDialogErro("Preencha todos os Campos!");
+            }else if(clienteNome.length() > 155 || clienteEndereco.length() > 500 || clienteTelefone.length() > 55 ){
+                alertDialogErro("Os campos excedem o tamanho de maximo de caracteres.");
+            }else{
+                verificarCheckboxManual();
+            }
+        }
 
-        if(clienteNome.isEmpty() || clienteEndereco.isEmpty() || clienteTelefone.isEmpty() ||
-                formaEntrega.isEmpty() || formaPagamento.isEmpty() || casoFalta.isEmpty() || fonte.isEmpty()){
-            alertDialogErro("Preencha todos os Campos!");
-        }else if(clienteNome.length() > 155 || clienteEndereco.length() > 500 || clienteTelefone.length() > 55 ){
-            alertDialogErro("Os campos excedem o tamanho de maximo de caracteres.");
+
+    }
+
+
+    private void verificarCheckboxManual (){
+        if (checkBoxManual.isSelected()) {
+            insertPedidoManual();
         }else{
             insertPedido();
         }
     }
 
+    private void insertPedidoManual() {
+        query =  "INSERT INTO `Pedidos`(`id`, `cliente_id`, `cliente_nome`, " +
+                "`cliente_endereco`, `cliente_telefone`, `forma_envio`, `forma_pagamento`, " +
+                "`forma_subst`, `data_entrada`, `horario_entrada`, `horario_triagem`, " +
+                "`horario_checkout`, `horario_finalizado`, `operador_id`, `entregador_id`, " +
+                "`fonte_pedido`, `status`, `troco`, `caixa_responsavel`, `status_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        Date horario = new Date(System.currentTimeMillis());
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+        String horario_entrada = format.format(horario);
+        System.out.println(dateFormat.format(date));
+        System.out.println(horario_entrada);
+        data_entrada = dateFormat.format(date);
+        LocalDate data = datePickerEntrada.getValue();
+        String dataInformada = data.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-    private void verificarCheckboxManual (){
+        Usuario caixa = db_crud.metodoRecuperarUsuario("", edtCaixa.getText().toUpperCase());
+        Usuario entregador = db_crud.metodoRecuperarUsuario("", edtEntregador.getText().toUpperCase());
 
+
+        String hEntrada = timePickerEntrada.getValue().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String hTriagem = timePickerTriagem.getValue().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String hCheckout = timePickerCheckout.getValue().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String hSaida = timePickerSaida.getValue().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String hFinalizado = timePickerFinalizado.getValue().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        OrdemPedido pedido = new OrdemPedido(
+                0,
+                cliente_id,
+                clienteNome,
+                clienteEndereco,
+                clienteTelefone,
+                formaEntrega,
+                formaPagamento,
+                casoFalta,
+                dataInformada,
+                hEntrada,
+                hTriagem,
+                hCheckout,
+                hFinalizado,
+                user.getId(),
+                entregador.getId(),
+                fonte,
+                "Finalizado",
+                troco,
+                edtCaixa.getText().toUpperCase(),
+                3);
+
+        System.out.println(pedido.getStatus_id());
+        boolean state = db_crud.metodoInsertPedido(pedido, query);
+        if(state == true){
+            query = "INSERT INTO `Pedido_Estatisticas`" +
+                    "(`id_static`,`id`, `m.t`, `m.e`, `h.p`, data) " +
+                    "VALUES (?,?,?,?,?,?)";
+            System.out.println("Criando model estatistica com os dados:" + "ID: " + pedido.getId() + "Horario Triagem: " + pedido.getHorario_triagem() + "Horario Checkout: " + pedido.getHorario_checkout() + "Horario Finalizado: " + pedido.getHorario_finalizado() + "Horario Entrada: " +  pedido.getHorario_entrada());
+            PedidoEstatistica estatistica = createEstatistica(pedido.getId(), pedido.getHorario_triagem(), pedido.getHorario_checkout(), pedido.getHorario_finalizado(), pedido.getHorario_entrada());
+            boolean statistics = db_crud.metodoInsertEstatistica(estatistica,pedido.getData_entrada(), query);
+            if(statistics == true){
+                restartAdd();
+                System.out.println("Sucesso ao gerar estatistica do pedido");
+            }else{
+                System.out.println("Houve um problema ao gerar estatistica do pedido");
+            }
+        }else{
+            JFXDialog dialog = AlertDialogModel.alertDialogErro("Houve um problema ao tentar incluir pedido", stackPane);
+            dialog.show();
+        }
     }
+
+
 
     private void insertPedido() {
         query =  "INSERT INTO `Pedidos`(`id`, `cliente_id`, `cliente_nome`, " +
@@ -706,6 +893,19 @@ public class novoPedidoController implements Initializable {
     //Objetos
 
     //Metodos de Controle
+    private void restartAdd() {
+        edtEntregador.clear();
+        edtCaixa.clear();
+        edtEndereco.clear();
+        edtNome.clear();
+        edtTel.clear();
+        edtFormaEnvio.clear();
+        edtFonte.clear();
+        edtTroco.clear();
+        edtCasoFalta.clear();
+        edtFormaPagamento.clear();
+        edtNome.requestFocus();
+    }
     private void setClienteEDT(Cliente cliente){
         edtNome.setText(cliente.getNome());
         edtEndereco.setText(cliente.getEndereco());
@@ -716,6 +916,40 @@ public class novoPedidoController implements Initializable {
         Stage stage = (Stage) stackPane.getScene().getWindow();
         stage.getOnCloseRequest().handle(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
         stage.close();
+    }
+
+    private LocalDate nowOnDate(){
+        LocalDate localDate = LocalDate.now();
+        localDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        dataAtual = formatData(localDate.toString());
+        System.out.println("Data Atual: " + dataAtual);
+        return localDate;
+
+    }
+    private LocalTime nowOnTime(){
+        LocalTime localTime = LocalTime.now();
+        localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        return localTime;
+
+    }
+    private String onDate (JFXDatePicker picker){
+        LocalDate localDate = picker.getValue();
+        String dataFormatada = formatData(localDate.toString());
+        //dataInicial = formatData(localDate.toString());
+        //datePicker.setPromptText(dataInicial);
+        return dataFormatada;
+    }
+    public String formatData (String data){
+        SimpleDateFormat sdf = null;
+        Date d = null;
+        try{
+            sdf = new SimpleDateFormat("yy-MM-dd");
+            d = sdf.parse(data);
+            sdf.applyPattern("yyyy-MM-dd");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return sdf.format(d);
     }
     //Metodos de Controle
 }

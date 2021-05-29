@@ -4,6 +4,7 @@
 <?import com.jfoenix.controls.JFXCheckBox?>
 <?import com.jfoenix.controls.JFXDatePicker?>
 <?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXTimePicker?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.effect.DropShadow?>
@@ -14,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<StackPane fx:id="stackPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="810.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.novoPedidoController">
+<StackPane fx:id="stackPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="467.0" prefWidth="810.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.novoPedidoController">
    <children>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <top>
@@ -149,56 +150,30 @@
                         <Insets bottom="5.0" />
                      </padding>
                   </HBox>
-                  <HBox fx:id="hboxManual" alignment="CENTER_LEFT" prefHeight="67.0" prefWidth="827.0" spacing="5.0" visible="false">
+                  <HBox visible="false" fx:id="hboxManual" alignment="CENTER_LEFT" prefHeight="91.0" prefWidth="774.0" spacing="5.0">
                      <children>
-                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="189.0">
+                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="189.0" spacing="5.0">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="DATA ENTRADA">
-                                 <effect>
-                                    <DropShadow color="#0000001e" />
-                                 </effect>
-                              </Text>
-                              <JFXDatePicker style="-fx-background-color: white; -fx-border-color: black;" />
+                              <JFXDatePicker fx:id="datePickerEntrada" prefHeight="40.0" promptText="DATA ENTRADA" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
+                              <JFXTimePicker fx:id="timePickerEntrada" prefHeight="40.0" promptText="H. ENTRADA" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
                            </children>
                         </VBox>
-                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="157.0">
+                        <VBox alignment="TOP_CENTER" prefHeight="82.0" prefWidth="182.0" spacing="5.0">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="HORARIO ENTRADA">
-                                 <effect>
-                                    <DropShadow color="#0000001e" />
-                                 </effect>
-                              </Text>
-                              <JFXTextField fx:id="edtHemtrada" labelFloat="true" prefHeight="40.0" prefWidth="117.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                              <JFXTimePicker fx:id="timePickerTriagem" prefHeight="40.0" promptText="H. TRIAGEM" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
+                              <JFXTimePicker fx:id="timePickerCheckout" prefHeight="40.0" promptText="H. CHECKOUT" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
                            </children>
                         </VBox>
-                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="171.0">
+                        <VBox alignment="TOP_CENTER" prefHeight="82.0" prefWidth="183.0" spacing="5.0">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="HORARIO CHECKOUT">
-                                 <effect>
-                                    <DropShadow color="#0000001e" />
-                                 </effect>
-                              </Text>
-                              <JFXTextField fx:id="edtHcheckout" labelFloat="true" prefHeight="40.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                              <JFXTimePicker fx:id="timePickerSaida" prefHeight="40.0" promptText="H. SAIDA ENTREGA" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
+                              <JFXTimePicker fx:id="timePickerFinalizado" prefHeight="40.0" promptText="H. FINALIZADO" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
                            </children>
                         </VBox>
-                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="81.0">
+                        <VBox alignment="TOP_CENTER" prefHeight="82.0" prefWidth="175.0" spacing="5.0">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="HORARIO SAIDA ENTREGA">
-                                 <effect>
-                                    <DropShadow color="#0000001e" />
-                                 </effect>
-                              </Text>
-                              <JFXTextField fx:id="edtHsaida" labelFloat="true" prefHeight="40.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
-                           </children>
-                        </VBox>
-                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="160.0">
-                           <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="HORARIO ENTREGUE">
-                                 <effect>
-                                    <DropShadow color="#0000001e" />
-                                 </effect>
-                              </Text>
-                              <JFXTextField fx:id="edtHfinalizado" labelFloat="true" prefHeight="40.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                              <JFXTextField fx:id="edtCaixa" labelFloat="true" prefHeight="40.0" promptText="CAIXA RESPONSAVEL" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                              <JFXTextField fx:id="edtEntregador" labelFloat="true" prefHeight="40.0" promptText="ENTREGADOR RESPONSAVEL" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
                            </children>
                         </VBox>
                      </children>

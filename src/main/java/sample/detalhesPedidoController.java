@@ -703,11 +703,11 @@ public class  detalhesPedidoController implements Initializable {
                         dialog.show();
                     }
                     query = "INSERT INTO `Pedido_Estatisticas`" +
-                            "(`id_static`,`id`, `m.t`, `m.e`, `h.p`) " +
-                            "VALUES (?,?,?,?,?)";
+                            "(`id_static`,`id`, `m.t`, `m.e`, `h.p`, `data`) " +
+                            "VALUES (?,?,?,?,?,?)";
                     System.out.println("Criando model estatistica com os dados:" + "ID: " + pedido.getId() + "Horario Triagem: " + pedido.getHorario_triagem() + "Horario Checkout: " + pedido.getHorario_checkout() + "Horario Finalizado: " + horario_atual + "Horario Entrada: " +  pedido.getHorario_entrada());
                     PedidoEstatistica estatistica = createEstatistica(pedido.getId(), pedido.getHorario_triagem(), pedido.getHorario_checkout(), horario_atual, pedido.getHorario_entrada());
-                    boolean statistics = db_crud.metodoInsertEstatistica(estatistica, query);
+                    boolean statistics = db_crud.metodoInsertEstatistica(estatistica, pedido.getData_entrada(), query);
                     if(statistics == true){
                         System.out.println("Sucesso ao gerar estatistica do pedido");
                     }else{

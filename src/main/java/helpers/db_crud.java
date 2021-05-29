@@ -44,6 +44,49 @@ public class db_crud {
         return state;
     }
 
+    public static Usuario metodoRecuperarUsuario (String id, String nome){
+       boolean state = false;
+        Usuario usuario = null;
+        if(id.equals("")){
+            query = "SELECT * FROM `Usuarios` WHERE `nome` =?";
+            connection = db_connect.getConnect();
+            try {
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setString(1, nome);
+                resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()){
+                    usuario = new Usuario(
+                            resultSet.getInt("id"),
+                            resultSet.getString("nome"),
+                            resultSet.getString("senha"),
+                            resultSet.getInt("privilegio"));
+                }
+
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
+        }else if(nome.equals("")){
+            query = "SELECT * FROM `Usuarios` WHERE `id` =?";
+            connection = db_connect.getConnect();
+            try {
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setInt(1, Integer.parseInt(id));
+                resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()){
+                    usuario = new Usuario(
+                            resultSet.getInt("id"),
+                            resultSet.getString("nome"),
+                            resultSet.getString("senha"),
+                            resultSet.getInt("privilegio"));
+                }
+
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
+        }
+        return usuario;
+    }
+
     public static boolean metodoEditarProduto(int produto_id, String produto_nome){
         boolean state = false;
 
@@ -105,7 +148,7 @@ public class db_crud {
         }
         return insert;
     }
-    public static boolean metodoInsertEstatistica(PedidoEstatistica estatistica, String query){
+    public static boolean metodoInsertEstatistica(PedidoEstatistica estatistica,String data, String query){
         boolean state = false;
         connection = db_connect.getConnect();
         try{
@@ -115,6 +158,7 @@ public class db_crud {
             preparedStatement.setDouble(3, estatistica.getMt());
             preparedStatement.setDouble(4, estatistica.getMe());
             preparedStatement.setInt(5, estatistica.getHp());
+            preparedStatement.setString(6, data);
             int count = preparedStatement.executeUpdate();
             if (count > 0){
                 state = true;

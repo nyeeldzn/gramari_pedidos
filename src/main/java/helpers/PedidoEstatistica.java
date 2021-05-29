@@ -7,6 +7,7 @@ public class PedidoEstatistica {
     double me;
     int hp;
 
+
     public PedidoEstatistica(int id, double mt, double me, int hp) {
         this.id = id;
         this.mt = mt;
