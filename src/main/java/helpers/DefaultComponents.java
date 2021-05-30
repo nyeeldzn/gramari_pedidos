@@ -13,10 +13,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import models.Produto;
 
@@ -43,7 +40,9 @@ public class DefaultComponents {
     public static Text defaultText(String texto) {
         Text text = new Text(texto);
         text.setFont(Font.font("verdana", FontWeight.LIGHT, FontPosture.REGULAR, 20));
-        text.setStyle("-fx-fill: white");
+        text.setStyle("-fx-fill: black");
+        text.setTextAlignment(TextAlignment.CENTER);
+        text.setWrappingWidth(1200/6);
         return text;
     }
     public static JFXButton defaultButton(String texto){
@@ -79,6 +78,16 @@ public class DefaultComponents {
         return hBox;
     }
 
+    public static VBox card(){
+        VBox card = new VBox();
+        card.setAlignment(Pos.CENTER);
+        card.setPadding(new Insets(10,10,10,10));
+        card.setSpacing(10);
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0.0 , 0 );");
+        card.setPrefWidth(1200/6);
+        card.setPrefHeight(150);
+        return card;
+    }
 
     public static void alertDialog3Itens(JFXButton action, JFXTextField edt1, StackPane stackPane) throws IOException {
         JFXDialogLayout dialogLayout = new JFXDialogLayout();

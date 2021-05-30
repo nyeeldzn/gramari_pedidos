@@ -14,16 +14,19 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -46,8 +49,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static helpers.DefaultComponents.buttonIcon;
-import static helpers.DefaultComponents.defaultText;
+import static helpers.DefaultComponents.*;
 import static helpers.LineChartModel.lineChart;
 
 public class MainController implements Initializable {
@@ -431,23 +433,29 @@ public class MainController implements Initializable {
         nowOnDate();
 
         //Componentes
-        Text textPedidoPeriodo = defaultText("Pedidos por Periodo");
-        Text textHorarioPico = defaultText("Horarios de Pico");
-        Text textMediaTempoTriagem = defaultText("Media de Tempo de Triagem");
+        ScrollPane scrollPane = new ScrollPane();
+
+
+        Text textPedidoPeriodo = defaultText("Pedidos Por Dia");
+        Text textHorarioPico = defaultText("H.P Por Dia");
+        Text textMediaTempoTriagem = defaultText("M.T Por Dia");
+        Text textMTE = defaultText("M.E Por Dia");
         Text totalText = defaultText("Total:");
         Text numTotalText = defaultText("");
-        HBox hBoxPrincipal = new HBox();
-        hBoxPrincipal.setAlignment(Pos.CENTER);
-        HBox hBoxSecundario = new HBox();
-        hBoxSecundario.setAlignment(Pos.CENTER);
 
-        VBox vboxPedidosDiarios = new VBox();
-        vboxPedidosDiarios.setAlignment(Pos.CENTER);
-        VBox vboxHorariosPico = new VBox();
-        vboxHorariosPico.setAlignment(Pos.CENTER);
-        VBox vboxMediaTempoTriagem = new VBox();
-        vboxMediaTempoTriagem.setAlignment(Pos.CENTER);
-        //Componentes
+        Text textcard1 = defaultText("Total de Pedidos");
+        Text textcard2 = defaultText("M.P p/Cliente");
+        Text textcard3 = defaultText("M.T Total");
+        Text textcard4 = defaultText("M.E Total");
+
+        Text valuecard1 = defaultText("--,--");
+        Text bottomCard1 = defaultText("PEDIDOS");
+        Text valuecard2 = defaultText("--,--");
+        Text bottomCard2 = defaultText("PEDIDOS");
+        Text valuecard3 = defaultText("--,--");
+        Text bottomCard3 = defaultText("MINUTOS");
+        Text valuecard4 = defaultText("--,--");
+        Text bottomCard4 = defaultText("MINUTOS");
 
         //LineChart
         LineChart<String, Number> lineChartPedidosDiarios = lineChart();
@@ -461,7 +469,51 @@ public class MainController implements Initializable {
         LineChart<String, Number> lineChartMediaTempoTriagem = lineChart();
         XYChart.Series seriesMediaTempoTriagem = new XYChart.Series();
         lineChartMediaTempoTriagem.getData().add(seriesMediaTempoTriagem);
+
+        LineChart<String, Number> lineChartMTE = lineChart();
+        XYChart.Series seriesMTE = new XYChart.Series();
+        lineChartMTE.getData().add(seriesMTE);
         //LineChart
+
+
+        HBox row1 = new HBox();
+        row1.setAlignment(Pos.CENTER);
+        row1.setSpacing(40);
+        HBox row2 = new HBox();
+        row2.setAlignment(Pos.CENTER);
+        HBox row3 = new HBox();
+        row3.setAlignment(Pos.CENTER);
+
+        VBox card1 = card();
+        card1.getChildren().addAll(textcard1, DefaultComponents.FontIcon("FILE"), valuecard1, bottomCard1);
+        VBox card2 = card();
+        card2.getChildren().addAll(textcard2, DefaultComponents.FontIcon("USER_PLUS"), valuecard2, bottomCard2);
+        VBox card3 = card();
+        card3.getChildren().addAll(textcard3, DefaultComponents.FontIcon("SHOPPING_CART"), valuecard3, bottomCard3);
+        VBox card4 = card();
+        card4.getChildren().addAll(textcard4, DefaultComponents.FontIcon("MOTORCYCLE"), valuecard4, bottomCard4);
+
+        VBox cardChart1 = card();
+        cardChart1.setPrefWidth(500);
+        cardChart1.setPrefHeight(400);
+        cardChart1.getChildren().addAll(textPedidoPeriodo, cbPeriodoPedidoDiario, lineChartPedidosDiarios);
+
+        VBox cardChart2 = card();
+        cardChart2.setPrefWidth(500);
+        cardChart2.setPrefHeight(400);
+        cardChart2.getChildren().addAll(textHorarioPico, cbPeriodoHorarioPico, lineChartHorariosPico);
+
+        VBox cardChart3 = card();
+        cardChart3.setPrefWidth(500);
+        cardChart3.setPrefHeight(400);
+        cardChart3.getChildren().addAll(textMediaTempoTriagem, lineChartMediaTempoTriagem);
+
+        VBox cardChart4 = card();
+        cardChart4.setPrefWidth(500);
+        cardChart4.setPrefHeight(400);
+        cardChart4.getChildren().addAll(textMTE, lineChartMTE);
+
+        //Componentes
 
 
         cbPeriodoPedidoDiario.valueProperty().addListener(new ChangeListener() {
@@ -474,31 +526,54 @@ public class MainController implements Initializable {
             }
         });
 
-
-        vboxPedidosDiarios.getChildren().addAll(textPedidoPeriodo, cbPeriodoPedidoDiario, lineChartPedidosDiarios);
-        vboxHorariosPico.getChildren().addAll(textHorarioPico, cbPeriodoHorarioPico, lineChartHorariosPico);
-        vboxMediaTempoTriagem.getChildren().addAll(textMediaTempoTriagem, lineChartMediaTempoTriagem);
-
-
-        hBoxPrincipal.getChildren().addAll(vboxPedidosDiarios, vboxHorariosPico);
-        hBoxSecundario.getChildren().add(vboxMediaTempoTriagem);
+        row1.getChildren().addAll(card1, card2, card3, card4);
+        row2.getChildren().addAll(cardChart1, cardChart2);
+        row2.setSpacing(20);
+        row3.getChildren().addAll(cardChart3, cardChart4);
+        row3.setSpacing(20);
         VBox vboxFinal = new VBox();
-        vboxFinal.getChildren().addAll(hBoxPrincipal, hBoxSecundario);
+        vboxFinal.getChildren().addAll(row1, row2, row3);
+        vboxFinal.setPadding(new Insets(10,0,10,0));
+        vboxFinal.setSpacing(40);
 
         setupChartPedidosDiarios(dias, array, cbPeriodoPedidoDiario, seriesPedidosDiarios);
         setupChartHorariosPico(array, cbPeriodoHorarioPico, seriesHorarioPico);
 
         //setup chartline MT
         ArrayList<String> listaDatasMT = getArrayDatas(7);
-        ArrayList<Integer> MTChartArray = recuperarMediaTempoListagem(listaDatasMT);
+        ArrayList<Float> MTChartArray = recuperarMediaTempoListagem(listaDatasMT);
         seriesMediaTempoTriagem.getData().clear();
         for(int i = 0; i<MTChartArray.size(); i++){
             seriesMediaTempoTriagem.getData().add(new XYChart.Data<String, Number>(listaDatasMT.get(i), MTChartArray.get(i)));
         }
         //
 
+        //setup chatline ME
+        ArrayList<String> listaDatasME = getArrayDatas(7);
+        ArrayList<Float> MTEChartArray = recuperarMEdata(listaDatasME);
+        //System.out.println("MTECHARTARRAY SIZE: " + MTEChartArray);
+        //System.out.println("MTESERIES SIZE: " + seriesMTE.hashCode());
+        //System.out.println("DATASME: " + listaDatasME);
+        seriesMTE.getData().clear();
+        for(int i = 0; i<MTEChartArray.size(); i++){
+            seriesMTE.getData().add(new XYChart.Data<String, Number>(listaDatasME.get(i), MTEChartArray.get(i)));
+           // System.out.println("MTESERIES SIZE: " + seriesMTE.hashCode());
+        }
+
+        //
+
+
+        valuecard1.setText(String.valueOf(DataManagerAnalytcs.getPedidostotal()));
+        valuecard3.setText(String.valueOf(DataManagerAnalytcs.getMTAVGtotal()));
+        valuecard4.setText(String.valueOf(DataManagerAnalytcs.getMEAVGtotal()));
+
         numTotalText.setText(String.valueOf(listaTotalData.size()));
-        dashBoard.setCenter(vboxFinal);
+
+        scrollPane.setContent(vboxFinal);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPadding(new Insets(20,20,20,20));
+        dashBoard.setCenter(scrollPane);
+        //dashBoard.setPadding(new Insets(20,20,20,20));
     }
 
     private ArrayList<String> getArrayDatas(int dias){
@@ -510,28 +585,26 @@ public class MainController implements Initializable {
         return arrayDatas;
     }
 
-    private ArrayList<Integer> recuperarMediaTempoListagem(ArrayList<String> arrayDatas) {
+    private ArrayList<Float> recuperarMediaTempoListagem(ArrayList<String> arrayDatas) {
         int dias = arrayDatas.size();
         //recupera os dados por data
-        ArrayList<Integer> listaQTDPedidosPorData = new ArrayList<>();
+        ArrayList<Float> listaQTDPedidosPorData = new ArrayList<>();
         for(int i = 0; i<dias; i++) {
-            ArrayList<PedidoEstatistica> innerEstatisticas = new ArrayList<>();
+            //ArrayList<PedidoEstatistica> innerEstatisticas = new ArrayList<>();
             //listaMediaTriagem
             try {
-                query = "SELECT * FROM `Pedido_Estatisticas` WHERE `data` =?";
-                preparedStatement = connection.prepareStatement(query);
+                //query = "SELECT * FROM `Pedido_Estatisticas` WHERE `data` =?";
+                preparedStatement = connection.prepareStatement("SELECT AVG(`m.t`) FROM `Pedido_Estatisticas` WHERE `data` = ?");
+                //preparedStatement.setString(1, arrayDatas.get(i));
+                //resultSet = preparedStatement.executeQuery();
                 preparedStatement.setString(1, arrayDatas.get(i));
-                resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
-                    innerEstatisticas.add(
-                            new PedidoEstatistica(
-                                    resultSet.getInt("id"),
-                                    resultSet.getDouble("m.t"),
-                                    resultSet.getDouble("m.e"),
-                                    resultSet.getInt("h.p")));
-                }
-                System.out.println("Contando pedidos na data: " + arrayDatas.get(i) + " = " + innerEstatisticas.size());
-                listaQTDPedidosPorData.add(innerEstatisticas.size());
+                ResultSet rs = preparedStatement.executeQuery();
+                if(rs.next())
+                    //System.out.println("avg media triagem é: " + rs.getFloat(1));
+                    //innerEstatisticas.add(rs.getFloat(1));
+                    listaQTDPedidosPorData.add(rs.getFloat(1));
+                System.out.println("M.T LOG: Data:  " + arrayDatas.get(i) + " M.T PEDIDO = " + listaQTDPedidosPorData.get(i));
+                //listaQTDPedidosPorData.add(innerEstatisticas.size());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -540,6 +613,35 @@ public class MainController implements Initializable {
         //
         return listaQTDPedidosPorData;
     }
+    private ArrayList<Float> recuperarMEdata(ArrayList<String> arrayDatas) {
+        int dias = arrayDatas.size();
+        //recupera os dados por data
+        ArrayList<Float> listaQTDPedidosPorData = new ArrayList<>();
+        for(int i = 0; i<dias; i++) {
+            //ArrayList<PedidoEstatistica> innerEstatisticas = new ArrayList<>();
+            //listaMediaTriagem
+            try {
+                //query = "SELECT * FROM `Pedido_Estatisticas` WHERE `data` =?";
+                preparedStatement = connection.prepareStatement("SELECT AVG(`m.e`) FROM `Pedido_Estatisticas` WHERE `data` = ?");
+                //preparedStatement.setString(1, arrayDatas.get(i));
+                //resultSet = preparedStatement.executeQuery();
+                preparedStatement.setString(1, arrayDatas.get(i));
+                ResultSet rs = preparedStatement.executeQuery();
+                if(rs.next())
+                    //System.out.println("avg media triagem é: " + rs.getFloat(1));
+                    //innerEstatisticas.add(rs.getFloat(1));
+                    listaQTDPedidosPorData.add(rs.getFloat(1));
+                System.out.println("M.E LOG: Data:  " + arrayDatas.get(i) + " M.E PEDIDO = " + listaQTDPedidosPorData.get(i));
+                //listaQTDPedidosPorData.add(innerEstatisticas.size());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //
+        return listaQTDPedidosPorData;
+    }
+
 
     private void setupChartPedidosDiarios(int dias, ArrayList<String> array, JFXComboBox<String> cbPeriodo, XYChart.Series series) {
         listaTotalData.clear();

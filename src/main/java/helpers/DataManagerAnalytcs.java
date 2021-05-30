@@ -4,10 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import models.OrdemPedido;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -37,6 +34,21 @@ public class DataManagerAnalytcs {
         return isFinished;
     }
 
+    public static PedidoEstatistica createEstatistica(int pedido_id, String hTriagem, String hCheckout, String hFinalizado, String horaPedido) {
+
+        int horario_inicial = toMinutes(hTriagem);
+
+        int horario_checkout = toMinutes(hCheckout);
+        int horario_final = toMinutes(hFinalizado);
+        double mt = horario_checkout - horario_inicial;
+        double me = horario_final - horario_checkout;
+        int mp = toHour(hFinalizado);
+
+        PedidoEstatistica estatistica = new PedidoEstatistica(pedido_id, mt, me, mp);
+        System.out.println("Tempo de Listagem: " + mt + " Tempo de Entrega: " + me + " Horario Pedido: " + horaPedido);
+        return estatistica;
+    }
+
     public static ArrayList<String> getDatasArray(int dias, ArrayList<String> array, String dataInicial) {
         try {
             array = filtrarDadosPorData(dataInicial, dias);
@@ -60,7 +72,6 @@ public class DataManagerAnalytcs {
         }
         return array;
     }
-
     public static ArrayList<String> getHorariosArray(int dias, ArrayList<String> array, ObservableList listaPedidoFiltrados, String dataInicial) {
 
         array = new ArrayList<String>();
@@ -108,8 +119,6 @@ public class DataManagerAnalytcs {
 
         return array;
     }
-
-
     private static boolean recuperarQtdPedidos(ArrayList<String> arrayDatas, int qtdDias) {
         String query;
         query = "SELECT * FROM `Pedidos` WHERE `data_entrada` =?";
@@ -159,9 +168,6 @@ public class DataManagerAnalytcs {
         }
         return isFinalizado;
     }
-
-
-
     private static boolean recuperarQtdPedidosPhora(ArrayList<String> arrayDatas, int qtdHoras) {
         String query;
         query = "SELECT * FROM `Pedido_Estatisticas` WHERE `h.p` =?";
@@ -218,8 +224,6 @@ public class DataManagerAnalytcs {
         }
         return isFinalizado;
     }
-
-
     private static ArrayList<String> filtrarDadosPorData(String data, int qtdDias) throws ParseException {
         System.out.println("Iniciando busca por data");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -251,13 +255,66 @@ public class DataManagerAnalytcs {
 
         return listaDatas;
     }
-
     private static int mediaHorario (String h1, String h2){
         int media = 0;
 
 
         return media;
     }
+
+    public static int getMTAVGtotal (){
+        int value = 0;
+
+        String query = "SELECT  AVG (`m.t`) FROM `Pedido_Estatisticas`";
+        try {
+            Connection connection = db_connect.getConnect();
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                value = (int) resultSet.getFloat(1);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return value;
+    }
+    public static int getMEAVGtotal (){
+        int value = 0;
+
+        String query = "SELECT  AVG (`m.e`) FROM `Pedido_Estatisticas`";
+        try {
+            Connection connection = db_connect.getConnect();
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                value = (int) resultSet.getFloat(1);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return value;
+    }
+    public static int getPedidostotal (){
+        int value = 0;
+        try {
+            Connection connection = db_connect.getConnect();
+
+            Statement s = connection.createStatement();
+            ResultSet r = s.executeQuery("SELECT COUNT(*) AS rowcount FROM Pedidos");
+            r.next();
+            value= r.getInt("rowcount");
+            r.close();
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return value;
+    }
+
+
 
     public static int toMinutes (String sDur){
         String[] hoursMin = sDur.split(":");
@@ -271,7 +328,6 @@ public class DataManagerAnalytcs {
         System.out.println("HORARIO: " + sDur + "CONVERTIDO PARA MINUTOS: " + horarioFinal);
         return horarioFinal;
     }
-
     public static int toHour (String sDur){
         String[] hoursMin = sDur.split(":");
 
@@ -282,21 +338,6 @@ public class DataManagerAnalytcs {
 
         System.out.println("HORA RECEBIDO: " + sDur + "CONVERTIDO PARA HORAS: " + iHour);
         return iHour;
-    }
-
-    public static PedidoEstatistica createEstatistica(int pedido_id, String hTriagem, String hCheckout, String hFinalizado, String horaPedido) {
-
-        int horario_inicial = toMinutes(hTriagem);
-
-        int horario_checkout = toMinutes(hCheckout);
-        int horario_final = toMinutes(hFinalizado);
-        double mt = horario_checkout - horario_inicial;
-        double me = horario_final - horario_checkout;
-        int mp = toHour(hFinalizado);
-
-        PedidoEstatistica estatistica = new PedidoEstatistica(pedido_id, mt, me, mp);
-        System.out.println("Tempo de Listagem: " + mt + " Tempo de Entrega: " + me + " Horario Pedido: " + horaPedido);
-        return estatistica;
     }
 
 
