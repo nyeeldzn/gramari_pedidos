@@ -33,6 +33,7 @@ import models.OrdemPedido;
 import models.Usuario;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.sql.*;
 import java.text.ParseException;
@@ -459,7 +460,7 @@ public class MainController implements Initializable {
 
         LineChart<String, Number> lineChartMediaTempoTriagem = lineChart();
         XYChart.Series seriesMediaTempoTriagem = new XYChart.Series();
-        lineChartHorariosPico.getData().add(seriesMediaTempoTriagem);
+        lineChartMediaTempoTriagem.getData().add(seriesMediaTempoTriagem);
         //LineChart
 
 
@@ -482,27 +483,75 @@ public class MainController implements Initializable {
         hBoxPrincipal.getChildren().addAll(vboxPedidosDiarios, vboxHorariosPico);
         hBoxSecundario.getChildren().add(vboxMediaTempoTriagem);
         VBox vboxFinal = new VBox();
-        vboxFinal.getChildren().addAll(hBoxPrincipal);
+        vboxFinal.getChildren().addAll(hBoxPrincipal, hBoxSecundario);
 
         setupChartPedidosDiarios(dias, array, cbPeriodoPedidoDiario, seriesPedidosDiarios);
         setupChartHorariosPico(array, cbPeriodoHorarioPico, seriesHorarioPico);
 
-
+        //setup chartline MT
+        ArrayList<String> listaDatasMT = getArrayDatas(7);
+        ArrayList<Integer> MTChartArray = recuperarMediaTempoListagem(listaDatasMT);
+        seriesMediaTempoTriagem.getData().clear();
+        for(int i = 0; i<MTChartArray.size(); i++){
+            seriesMediaTempoTriagem.getData().add(new XYChart.Data<String, Number>(listaDatasMT.get(i), MTChartArray.get(i)));
+        }
+        //
 
         numTotalText.setText(String.valueOf(listaTotalData.size()));
         dashBoard.setCenter(vboxFinal);
+    }
+
+    private ArrayList<String> getArrayDatas(int dias){
+        ArrayList<String> arrayDatas = new ArrayList<>();
+        //Recupera datas para busca
+        arrayDatas = DataManagerAnalytcs.getDatasArrayMT(dias, arrayDatas, dataInicial);
+        System.out.println("Debug Test, datas de busca: " + arrayDatas);
+        //
+        return arrayDatas;
+    }
+
+    private ArrayList<Integer> recuperarMediaTempoListagem(ArrayList<String> arrayDatas) {
+        int dias = arrayDatas.size();
+        //recupera os dados por data
+        ArrayList<Integer> listaQTDPedidosPorData = new ArrayList<>();
+        for(int i = 0; i<dias; i++) {
+            ArrayList<PedidoEstatistica> innerEstatisticas = new ArrayList<>();
+            //listaMediaTriagem
+            try {
+                query = "SELECT * FROM `Pedido_Estatisticas` WHERE `data` =?";
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setString(1, arrayDatas.get(i));
+                resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    innerEstatisticas.add(
+                            new PedidoEstatistica(
+                                    resultSet.getInt("id"),
+                                    resultSet.getDouble("m.t"),
+                                    resultSet.getDouble("m.e"),
+                                    resultSet.getInt("h.p")));
+                }
+                System.out.println("Contando pedidos na data: " + arrayDatas.get(i) + " = " + innerEstatisticas.size());
+                listaQTDPedidosPorData.add(innerEstatisticas.size());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //
+        return listaQTDPedidosPorData;
     }
 
     private void setupChartPedidosDiarios(int dias, ArrayList<String> array, JFXComboBox<String> cbPeriodo, XYChart.Series series) {
         listaTotalData.clear();
         listaPedidoFiltrados.clear();
         dias = getDias(dias, cbPeriodo);
-        array = DataManagerAnalytcs.getDatasArray(dias, array, listaPedidoFiltrados, dataInicial);
+        array = DataManagerAnalytcs.getDatasArray(dias, array, dataInicial);
         if (DataManagerAnalytcs.isFinished == true) {
             listaTotalData = DataManagerAnalytcs.getListaTotalData();
             setChartLine(array, series);
         }
     }
+
     private void setupChartHorariosPico(ArrayList<String> array, JFXComboBox<String> cbPeriodo, XYChart.Series series) {
         listaTotalData.clear();
         listaPedidoFiltrados.clear();

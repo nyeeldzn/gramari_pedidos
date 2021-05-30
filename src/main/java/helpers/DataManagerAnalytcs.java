@@ -37,15 +37,24 @@ public class DataManagerAnalytcs {
         return isFinished;
     }
 
-    public static ArrayList<String> getDatasArray(int dias, ArrayList<String> array, ObservableList listaPedidoFiltrados, String dataInicial) {
+    public static ArrayList<String> getDatasArray(int dias, ArrayList<String> array, String dataInicial) {
         try {
-            array = filtrarDadosPorData(listaPedidoFiltrados ,dataInicial, dias);
+            array = filtrarDadosPorData(dataInicial, dias);
             System.out.println("Datas de busca: " + array);
             boolean next = recuperarQtdPedidos(array, dias);
             if(next == true){
                 System.out.println(listaTotalData);
                 isFinished = true;
             }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return array;
+    }
+    public static ArrayList<String> getDatasArrayMT(int dias, ArrayList<String> array, String dataInicial) {
+        try {
+            array = filtrarDadosPorData(dataInicial, dias);
+            System.out.println("Datas de busca: " + array);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -78,6 +87,17 @@ public class DataManagerAnalytcs {
         array.add("1");
         array.add("2");
         array.add("3");
+
+        System.out.println("Horas de busca: " + array);
+        boolean next = recuperarHorarioTriagem(array, dias);
+        if(next == true){
+            System.out.println(listaHorasTriagem);
+            isFinished = true;
+        }
+
+        return array;
+    }
+    public static ArrayList<String> getMTporDia(int dias, ArrayList<String> array) {
 
         System.out.println("Horas de busca: " + array);
         boolean next = recuperarHorarioTriagem(array, dias);
@@ -140,6 +160,8 @@ public class DataManagerAnalytcs {
         return isFinalizado;
     }
 
+
+
     private static boolean recuperarQtdPedidosPhora(ArrayList<String> arrayDatas, int qtdHoras) {
         String query;
         query = "SELECT * FROM `Pedido_Estatisticas` WHERE `h.p` =?";
@@ -198,7 +220,7 @@ public class DataManagerAnalytcs {
     }
 
 
-    private static ArrayList<String> filtrarDadosPorData(ObservableList<OrdemPedido> list, String data, int qtdDias) throws ParseException {
+    private static ArrayList<String> filtrarDadosPorData(String data, int qtdDias) throws ParseException {
         System.out.println("Iniciando busca por data");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date data_comparacao = format.parse(data);
