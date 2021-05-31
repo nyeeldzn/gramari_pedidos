@@ -617,7 +617,8 @@ public class clientesController implements Initializable {
                                 resultSet.getString("cliente_nome"),
                                 resultSet.getString("cliente_endereco"),
                                 resultSet.getString("cliente_telefone"),
-                                resultSet.getString("data_cadastro")
+                                resultSet.getString("data_cadastro"),
+                                resultSet.getInt("qtdPedidos")
                                 )
                         );
                         System.out.println("Clinte de ID: " + listaClientes.get(listaClientes.size() - 1).getId() + "|| Nome: " + listaClientes.get(listaClientes.size() - 1).getNome());

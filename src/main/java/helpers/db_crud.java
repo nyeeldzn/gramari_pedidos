@@ -44,6 +44,26 @@ public class db_crud {
         return state;
     }
 
+    public static boolean metodoClienteAddPedido(int cliente_id, int cliente_qtd){
+        boolean state = false;
+
+        try {
+            Connection connection = db_connect.getConnect();
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE `Clientes` SET `qtdPedidos`= ? WHERE `id` =?");
+            preparedStatement.setInt(1, cliente_qtd + 1);
+            preparedStatement.setInt(2, cliente_id);
+            int count  = preparedStatement.executeUpdate();
+            if (count > 0) {
+                state = true;
+            }else{
+                state = false;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return state;
+    }
     public static Usuario metodoRecuperarUsuario (String id, String nome){
        boolean state = false;
         Usuario usuario = null;
@@ -369,7 +389,8 @@ public class db_crud {
                         resultSet.getString("cliente_nome"),
                         resultSet.getString("cliente_endereco"),
                         resultSet.getString("cliente_telefone"),
-                        resultSet.getString("data_cadastro"));
+                        resultSet.getString("data_cadastro"),
+                        resultSet.getInt("qtdPedidos"));
             }
 
         }catch (SQLException ex){

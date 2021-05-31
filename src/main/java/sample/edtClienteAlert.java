@@ -88,7 +88,8 @@ public class edtClienteAlert implements Initializable {
                     resultSet.getString("cliente_nome"),
                     resultSet.getString("cliente_endereco") ,
                     resultSet.getString("cliente_telefone"),
-                    resultSet.getString("data_cadastro")
+                    resultSet.getString("data_cadastro"),
+                    resultSet.getInt("qtdPedidos")
             );
             System.out.println(resultSet.getString("cliente_nome"));
         }

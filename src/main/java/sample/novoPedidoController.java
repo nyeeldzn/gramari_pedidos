@@ -169,7 +169,8 @@ public class novoPedidoController implements Initializable {
                             resultSet.getString("cliente_nome"),
                             resultSet.getString("cliente_endereco"),
                             resultSet.getString("cliente_telefone"),
-                            resultSet.getString("data_cadastro")
+                            resultSet.getString("data_cadastro"),
+                            resultSet.getInt("qtdPedidos")
                     )
             );
             System.out.println("Usuario recuperado: " + resultSet.getString("cliente_nome"));
@@ -607,6 +608,8 @@ public class novoPedidoController implements Initializable {
         System.out.println(horario_entrada);
         data_entrada = dateFormat.format(date);
 
+        Cliente clienteAtual = db_crud.metodoRecupCliente(clienteNome);
+
         OrdemPedido pedido = new OrdemPedido(
                 0,
                 cliente_id,
@@ -632,7 +635,14 @@ public class novoPedidoController implements Initializable {
         System.out.println(pedido.getStatus_id());
         boolean state = db_crud.metodoInsertPedido(pedido, query);
         if(state == true){
-            fecharJanela();
+            boolean state2 = db_crud.metodoClienteAddPedido(clienteAtual.getId(), clienteAtual.getQtdPedidos());
+            if(state2 == true){
+                fecharJanela();
+            }else{
+             JFXDialog alert = AlertDialogModel.alertDialogErro("Houve um problema ao adicionar um novo pedido na contagem do cliente", stackPane);
+                alert.show();
+            }
+
         }else{
             JFXDialog dialog = AlertDialogModel.alertDialogErro("Houve um problema ao tentar incluir pedido", stackPane);
             dialog.show();

@@ -111,7 +111,7 @@ public class importarClientesController implements Initializable {
             Cell cellNumero = sheet.getCell(5, i);
             Cell cellBairro = sheet.getCell(6, i);
             String enderecoCompleto = cellEndereco.getContents() + "," + cellNumero.getContents() + "," + cellBairro.getContents() ;
-            listaTemporaria.add(new Cliente(0, cellNome.getContents(), enderecoCompleto, "Sem Numero Cadastrado", "Usuario Importado"));
+            listaTemporaria.add(new Cliente(0, cellNome.getContents(), enderecoCompleto, "Sem Numero Cadastrado", "Usuario Importado", 0));
             System.out.println("Cliente: " + listaTemporaria.get(i).getNome() + " " + listaTemporaria.get(i).getTelefone() + " " + listaTemporaria.get(i).getEndereco() + " " + listaTemporaria.get(i).getData_cadastro());
         }
         workbook.close();

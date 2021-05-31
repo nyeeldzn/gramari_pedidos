@@ -313,6 +313,25 @@ public class DataManagerAnalytcs {
 
         return value;
     }
+    public static int getMPC (){
+        int value = 0;
+
+        String query = "SELECT  AVG (`qtdPedidos`) FROM `Pedidos`";
+        try {
+            Connection connection = db_connect.getConnect();
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT AVG (qtdPedidos) FROM Clientes WHERE qtdPedidos > 0");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                value = (int) resultSet.getFloat(1);
+                System.out.println(resultSet.getFloat(1));
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return value;
+    }
+
 
 
 

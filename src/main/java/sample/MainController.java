@@ -564,6 +564,7 @@ public class MainController implements Initializable {
 
 
         valuecard1.setText(String.valueOf(DataManagerAnalytcs.getPedidostotal()));
+        valuecard2.setText(String.valueOf(DataManagerAnalytcs.getMPC()));
         valuecard3.setText(String.valueOf(DataManagerAnalytcs.getMTAVGtotal()));
         valuecard4.setText(String.valueOf(DataManagerAnalytcs.getMEAVGtotal()));
 
