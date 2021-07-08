@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="gramari_pedidos.jnlp">
+  <information>
+    <title>Gerenciador de Pedidos - Gramari Supermercados</title>
+    <vendor>Unknown</vendor>
+    <description>GGP Exec</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="gramari_pedidos.jar" size="570807" download="eager" />
+  </resources>
+  <jfx:javafx-desc  width="1200" height="800" main-class="sample.Main"  name="GGP Exec" />
+  <update check="background"/>
+</jnlp>

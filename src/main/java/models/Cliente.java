@@ -5,17 +5,27 @@ public class Cliente {
     int id;
     String nome;
     String endereco;
+    String bairro;
     String telefone;
     String data_cadastro;
     int qtdPedidos;
 
-    public Cliente(int id, String nome, String endereco, String telefone, String data_cadastro, int qtdPedidos) {
+    public Cliente(int id, String nome, String endereco, String bairro, String telefone, String data_cadastro, int qtdPedidos) {
         this.id = id;
         this.nome = nome;
         this.endereco = endereco;
+        this.bairro = bairro;
         this.telefone = telefone;
         this.data_cadastro = data_cadastro;
         this.qtdPedidos = qtdPedidos;
+    }
+
+    public String getBairro() {
+        return bairro;
+    }
+
+    public void setBairro(String bairro) {
+        this.bairro = bairro;
     }
 
     public int getQtdPedidos() {

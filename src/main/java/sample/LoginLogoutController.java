@@ -1,11 +1,12 @@
 package sample;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXPasswordField;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import helpers.AlertDialogModel;
 import helpers.AuthenticationSystem;
+import helpers.DefaultComponents;
+import helpers.Database.db_connect;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,12 +14,22 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import models.Usuario;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 public class LoginLogoutController implements Initializable {
@@ -37,6 +48,9 @@ public class LoginLogoutController implements Initializable {
     private JFXButton btnClose;
 
     @FXML
+    private JFXButton btnConfig;
+
+    @FXML
     private JFXTextField edtUsername;
 
     @FXML
@@ -45,6 +59,11 @@ public class LoginLogoutController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        verificarConnection();
+        btnConfig.setOnAction((e) -> {
+            configHostDialog();
+        });
+        
         setupStackPane();
         edtUsername.setTextFormatter(new TextFormatter<Object>((change) -> {
             change.setText(change.getText().toUpperCase());
@@ -88,6 +107,66 @@ public class LoginLogoutController implements Initializable {
 
     }
 
+    private void configHostDialog() {
+        //recuperar raiz da aplicação
+        String caminho = "";
+        try {
+            caminho = LoginLogoutController.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+            //caminho = caminho.substring(1, caminho.lastIndexOf('/') + 1);
+            System.out.println(caminho);
+
+            //AuthenticationSystem.WConfig(caminho);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        JFXButton buttonCancelar = new JFXButton("Cancelar");
+        JFXButton buttonSalvar = new JFXButton("Salvar");
+
+        JFXDialog dialogErro = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
+
+        VBox vBox = DefaultComponents.defaultVBox();
+
+        JFXTextField field = DefaultComponents.textFieldPadrao(100);
+        Text texto = new Text();
+        texto.setText("Informe o HOST: ");
+        texto.setFont(Font.font("verdana", FontWeight.LIGHT, FontPosture.REGULAR, 20));
+        buttonCancelar.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent event) ->{
+            dialogErro.close();
+        });
+        String finalCaminho = caminho;
+        buttonSalvar.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent event) ->{
+            db_connect.setHOST(field.getText().trim());
+            boolean state = verificarConnection();
+            if(state){
+
+                /*        implementacao de salvar arquivo de config
+                try {
+                    System.out.println("Tentando salvar aquivo de config");
+                    AuthenticationSystem.setConfig(finalCaminho);
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+
+                         //implementacao de salvar arquivo de config
+                 */
+
+                dialogErro.close();
+            }
+        });
+        vBox.getChildren().addAll(texto, field);
+        dialogLayout.setBody(vBox);
+        dialogLayout.setActions(buttonSalvar, buttonCancelar);
+
+        dialogErro.show();
+
+
+
+
+    }
+
+
     private void setupStackPane() {
         // new Image(url)
         Image image = new Image(getClass().getResource("/loginbg.jpeg").toExternalForm());
@@ -121,6 +200,45 @@ public class LoginLogoutController implements Initializable {
         }
     }
 
+    private boolean verificarConnection() {
+        boolean state = false;
+        String host = db_connect.getHost();
+        if(host.equals("")){
+            JFXDialog dialog = AlertDialogModel.alertDialogErro("Favor realizar conexao ao DB", stackPane);
+            state = false;
+            dialog.show();
+        }else{
+            ObservableList<Usuario> users  = FXCollections.observableArrayList();
+            String query = "SELECT * FROM Usuarios";
+            try {
+                Connection conn = db_connect.getConnect();
+                PreparedStatement p = conn.prepareStatement(query);
+                ResultSet r = p.executeQuery();
+                while (r.next()) {
+                    users.add(new Usuario(
+                            r.getInt("id"),
+                            r.getString("nome"),
+                            "",
+                            r.getInt("privilegio")
+                    ));
+                }
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
+            if(users.size() <= 0){
+                JFXDialog dialog = AlertDialogModel.alertDialogErro("Houve um problema ao tentar se conectar", stackPane);
+                dialog.show();
+                state = false;
+            }else{
+                JFXDialog dialog = AlertDialogModel.alertDialogErro("Conectado com sucesso", stackPane);
+                dialog.show();
+                state = true;
+            }
+        }
+
+        return state;
+    }
+
     private void iniciarHome() {
         Parent parent = null;
         try {
@@ -138,4 +256,5 @@ public class LoginLogoutController implements Initializable {
         stageAtual.setScene(cenaAtual);
 
     }
+
 }

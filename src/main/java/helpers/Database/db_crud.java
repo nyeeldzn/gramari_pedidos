@@ -1,5 +1,6 @@
-package helpers;
+package helpers.Database;
 
+import helpers.PedidoEstatistica;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import models.Cliente;
@@ -9,13 +10,8 @@ import sample.clientesController;
 import sample.detalhesPedidoController;
 import sample.novoPedidoController;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -106,7 +102,129 @@ public class db_crud {
         }
         return usuario;
     }
+    public static ObservableList<Usuario> getEntregadores () {
+        String query = "SELECT * FROM Usuarios WHERE privilegio =?";
+        ObservableList<Usuario> users = FXCollections.observableArrayList();
+        try {
+            Connection conn = db_connect.getConnect();
+            PreparedStatement pS = conn.prepareStatement(query);
+            pS.setInt(1, 1);
+            ResultSet rs = pS.executeQuery();
+            while (rs.next()){
+                users.add(new Usuario(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        "",
+                        rs.getInt("privilegio")
+                ));
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
 
+        return users;
+    }
+    public static ArrayList<String> getCaixas () {
+        ArrayList<String> users = new ArrayList<>();
+
+        users.add("PEDRO");
+        users.add("DEBORA");
+        users.add("FRANCIELE");
+        users.add("GABRIELA");
+        users.add("VITORIA");
+        users.add("CAMILA");
+        users.add("GUILHERME");
+        users.add("OUTROS");
+
+        return users;
+    }
+
+
+    public static boolean addBairro(String nome_bairro){
+        boolean state = false;
+        String query = "INSERT INTO `Bairros`(`id`, `nome_bairro`) VALUES (?,?)";
+        try{
+            Connection conn = db_connect.getConnect();
+            PreparedStatement p = conn.prepareStatement(query);
+            p.setInt(1,0);
+            p.setString(2, nome_bairro);
+            int count = p.executeUpdate();
+            if(count > 0){
+                state = true;
+            }else{
+                state = false;
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+
+        return state;
+    }
+    public static ArrayList<String> getBairros(){
+        ArrayList<String> list = new ArrayList<>();
+
+        String query = "SELECT  * FROM `Bairros`";
+        try{
+            Connection conn = db_connect.getConnect();
+            PreparedStatement p = conn.prepareStatement(query);
+            ResultSet r = p.executeQuery();
+            while (r.next()) {
+                list.add(r.getString("nome_bairro"));
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+
+
+        return list;
+    }
+
+
+    public static OrdemPedido recuperarPedidoNovoPedido(String nome, String data, String hora){
+        boolean state = false;
+        
+        OrdemPedido pedido = null;
+        
+        try {
+            String query = "SELECT * FROM Pedidos WHERE cliente_nome = ? AND data_entrada = ? AND horario_entrada = ?";
+            Connection conn = db_connect.getConnect();
+            PreparedStatement p = conn.prepareStatement(query);
+            p.setString(1, nome);
+            p.setString(2, data);
+            p.setString(3, hora);
+            ResultSet r = p.executeQuery();
+            while(r.next()){
+                pedido = new OrdemPedido(
+                        r.getInt("id"),
+                        r.getInt("cliente_id"),
+                        r.getString("cliente_nome"),
+                        r.getString("cliente_endereco"),
+                        r.getString("bairro"),
+                        r.getString("cliente_telefone"),
+                        r.getString("forma_envio"),
+                        r.getString("forma_pagamento"),
+                        r.getString("data_entrada"),
+                        r.getString("horario_entrada"),
+                        r.getString("horario_triagem"),
+                        r.getString("horario_checkout"),
+                        r.getString("horario_saida"),
+                        r.getString("horario_finalizado"),
+                        r.getInt("operador_id"),
+                        r.getInt("entregador_id"),
+                        r.getString("fonte_pedido"),
+                        r.getString("status"),
+                        r.getDouble("troco"),
+                        r.getString("caixa_responsavel"),
+                        r.getInt("status_id")
+                );
+            }
+
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+
+        return pedido;
+    }
     public static boolean metodoEditarProduto(int produto_id, String produto_nome){
         boolean state = false;
 
@@ -138,22 +256,23 @@ public class db_crud {
             preparedStatement.setInt(   2,  pedido.getCliente_id());
             preparedStatement.setString(3,  pedido.getCliente_nome());
             preparedStatement.setString(4,  pedido.getEnd_cliente());
-            preparedStatement.setString(5,  pedido.getNum_cliente());
-            preparedStatement.setString(6,  pedido.getForma_envio());
-            preparedStatement.setString(7,  pedido.getForma_pagamento());
-            preparedStatement.setString(8,  pedido.getForma_subst());
+            preparedStatement.setString(5,  pedido.getBairro());
+            preparedStatement.setString(6,  pedido.getNum_cliente());
+            preparedStatement.setString(7,  pedido.getForma_envio());
+            preparedStatement.setString(8,  pedido.getForma_pagamento());
             preparedStatement.setString(9,  pedido.getData_entrada());
             preparedStatement.setString(10, pedido.getHorario_entrada());
             preparedStatement.setString(11, pedido.getHorario_triagem());
             preparedStatement.setString(12, pedido.getHorario_checkout());
-            preparedStatement.setString(13, pedido.getHorario_finalizado());
-            preparedStatement.setInt(   14, pedido.getOperador_id());
-            preparedStatement.setDouble(15, pedido.getEntregador_id());
-            preparedStatement.setString(16, pedido.getFonte_pedido());
-            preparedStatement.setString(17, pedido.getStatus());
-            preparedStatement.setDouble(18, pedido.getTroco());
-            preparedStatement.setString(19, pedido.getCaixa_responsavel());
-            preparedStatement.setInt(20, pedido.getStatus_id());
+            preparedStatement.setString(13, pedido.getHorario_saidaentrega());
+            preparedStatement.setString(14, pedido.getHorario_finalizado());
+            preparedStatement.setInt(   15, pedido.getOperador_id());
+            preparedStatement.setDouble(16, pedido.getEntregador_id());
+            preparedStatement.setString(17, pedido.getFonte_pedido());
+            preparedStatement.setString(18, pedido.getStatus());
+            preparedStatement.setDouble(19, pedido.getTroco());
+            preparedStatement.setString(20, pedido.getCaixa_responsavel());
+            preparedStatement.setInt(21, pedido.getStatus_id());
             System.out.println(pedido.getStatus_id());
             int count = preparedStatement.executeUpdate();
             if(count > 0){
@@ -168,7 +287,7 @@ public class db_crud {
         }
         return insert;
     }
-    public static boolean metodoInsertEstatistica(PedidoEstatistica estatistica,String data, String query){
+    public static boolean metodoInsertEstatistica(PedidoEstatistica estatistica, String data, String query){
         boolean state = false;
         connection = db_connect.getConnect();
         try{
@@ -312,7 +431,44 @@ public class db_crud {
 
         return state;
     }
+    public static boolean insertObservacao (int pedido_index, String text){
+        boolean state = false;
 
+        String query = "INSERT INTO `Observação`(`id`, `pedido_index`, `observação`) VALUES (?,?,?)";
+        try {
+            Connection conn = db_connect.getConnect();
+            PreparedStatement p = conn.prepareStatement(query);
+            p.setInt(1, 0);
+            p.setInt(2, pedido_index);
+            p.setString(3, text);
+            int count = p.executeUpdate();
+            if(count > 0){
+                state = true;
+            }else{
+                state = false;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return state;
+    }
+    public static String getPedidoObservacao(int pedido_index){
+        String query = "SELECT * FROM `Observação` WHERE `pedido_index` =?";
+        String result = null;
+        try {
+            Connection conn = db_connect.getConnect();
+            PreparedStatement p = conn.prepareStatement(query);
+            p.setInt(1, pedido_index);
+            ResultSet r = p.executeQuery();
+            while (r.next()) {
+                result = r.getString("observação");
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+        return result;
+    }
 
     public static ObservableList<OrdemPedido> recuperarPedidosViaStatus (String query,int value){
         ObservableList<OrdemPedido> listaTemporaria = FXCollections.observableArrayList();
@@ -327,14 +483,15 @@ public class db_crud {
                         resultSet.getInt("cliente_id"),
                         resultSet.getString("cliente_nome"),
                         resultSet.getString("cliente_endereco"),
+                        resultSet.getString("bairro"),
                         resultSet.getString("cliente_telefone"),
                         resultSet.getString("forma_envio"),
                         resultSet.getString("forma_pagamento"),
-                        resultSet.getString("forma_subst"),
                         resultSet.getString("data_entrada"),
                         resultSet.getString("horario_entrada"),
                         resultSet.getString("horario_triagem"),
                         resultSet.getString("horario_checkout"),
+                        resultSet.getString("horario_saida"),
                         resultSet.getString("horario_finalizado"),
                         resultSet.getInt("operador_id"),
                         resultSet.getInt("entregador_id"),
@@ -351,6 +508,98 @@ public class db_crud {
 
         return listaTemporaria;
     }
+
+
+
+    public static ObservableList<OrdemPedido> recuperarPedidosPorData(String query, String table, String dataInicial, String dataFinal, boolean cbState, int cb_selectedIndex) throws SQLException {
+        ObservableList<OrdemPedido> lista = FXCollections.observableArrayList();
+        lista.clear();
+        System.out.println("Data Inicial de busca: " + dataInicial + "Data final de busca: " + dataFinal);
+        connection = db_connect.getConnect();
+        preparedStatement = connection.prepareStatement(query);
+        if(cbState == true && cb_selectedIndex != 3){
+            preparedStatement.setString(1, table);
+            preparedStatement.setString(2, dataInicial);
+            preparedStatement.setString(3, dataFinal);
+        }else if (cbState == true && cb_selectedIndex == 3){
+            preparedStatement.setString(1, dataInicial);
+            preparedStatement.setString(2, dataFinal);
+        }
+        if(cbState == false && cb_selectedIndex != 3){
+            preparedStatement.setString(1, table);
+        }
+        resultSet = preparedStatement.executeQuery();
+        while(resultSet.next()){
+            lista.add(new OrdemPedido(
+                    resultSet.getInt("id"),
+                    resultSet.getInt("cliente_id"),
+                    resultSet.getString("cliente_nome"),
+                    resultSet.getString("cliente_endereco"),
+                    resultSet.getString("bairro"),
+                    resultSet.getString("cliente_telefone"),
+                    resultSet.getString("forma_envio"),
+                    resultSet.getString("forma_pagamento"),
+                    resultSet.getString("data_entrada"),
+                    resultSet.getString("horario_entrada"),
+                    resultSet.getString("horario_triagem"),
+                    resultSet.getString("horario_checkout"),
+                    resultSet.getString("horario_saida"),
+                    resultSet.getString("horario_finalizado"),
+                    resultSet.getInt("operador_id"),
+                    resultSet.getInt("entregador_id"),
+                    resultSet.getString("fonte_pedido"),
+                    resultSet.getString("status"),
+                    resultSet.getDouble("troco"),
+                    resultSet.getString("caixa_responsavel"),
+                    resultSet.getInt("status_id")
+            ));
+            System.out.println(resultSet.getString("cliente_nome"));
+        }
+
+        return lista;
+    }
+    public static ObservableList<OrdemPedido> recuperarPedidosDeClientePorData(String query,int cliente_id, String table, String dataInicial, String dataFinal) throws SQLException {
+        ObservableList<OrdemPedido> lista = FXCollections.observableArrayList();
+        lista.clear();
+        System.out.println("Data Inicial de busca: " + dataInicial + "Data final de busca: " + dataFinal);
+
+        connection = db_connect.getConnect();
+        preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, dataInicial);
+        preparedStatement.setString(2, dataFinal);
+        preparedStatement.setInt(3, cliente_id);
+        preparedStatement.setInt(4, Integer.parseInt(table));
+                resultSet = preparedStatement.executeQuery();
+        while(resultSet.next()){
+            lista.add(new OrdemPedido(
+                    resultSet.getInt("id"),
+                    resultSet.getInt("cliente_id"),
+                    resultSet.getString("cliente_nome"),
+                    resultSet.getString("cliente_endereco"),
+                    resultSet.getString("bairro"),
+                    resultSet.getString("cliente_telefone"),
+                    resultSet.getString("forma_envio"),
+                    resultSet.getString("forma_pagamento"),
+                    resultSet.getString("data_entrada"),
+                    resultSet.getString("horario_entrada"),
+                    resultSet.getString("horario_triagem"),
+                    resultSet.getString("horario_checkout"),
+                    resultSet.getString("horario_saida"),
+                    resultSet.getString("horario_finalizado"),
+                    resultSet.getInt("operador_id"),
+                    resultSet.getInt("entregador_id"),
+                    resultSet.getString("fonte_pedido"),
+                    resultSet.getString("status"),
+                    resultSet.getDouble("troco"),
+                    resultSet.getString("caixa_responsavel"),
+                    resultSet.getInt("status_id")
+            ));
+            System.out.println(resultSet.getString("cliente_nome"));
+        }
+
+        return lista;
+    }
+
 
     public static Usuario metodoRecupUsuario(String username){
         boolean state = false;
@@ -388,6 +637,7 @@ public class db_crud {
                         resultSet.getInt("id"),
                         resultSet.getString("cliente_nome"),
                         resultSet.getString("cliente_endereco"),
+                        resultSet.getString("bairro"),
                         resultSet.getString("cliente_telefone"),
                         resultSet.getString("data_cadastro"),
                         resultSet.getInt("qtdPedidos"));

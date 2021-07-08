@@ -29,11 +29,17 @@ public class Main extends Application {
             */
 
 
-        Parent root = FXMLLoader.load(getClass().getResource("/LoginLogoutScreen.fxml"));
+       // Parent root = FXMLLoader.load(getClass().getResource("src/main/java/fxml/loginLogoutScreen.fxml"));
+        // Parent root = FXMLLoader.load(getClass().getResource("/gramari_pedidos/fxml/LoginLogoutScreen.fxml"));
+         Parent root = FXMLLoader.load(getClass().getResource("/LoginLogoutScreen.fxml"));
+
         primaryStage.setTitle("LOGIN - GRAMARI");
         primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
+
+
+
 
 
         /*

@@ -2,7 +2,7 @@ package sample;
 
 import com.jfoenix.controls.JFXButton;
 import helpers.DefaultComponents;
-import helpers.db_connect;
+import helpers.Database.db_connect;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -61,7 +61,8 @@ public class importarClientesController implements Initializable {
                 connection = db_connect.getConnect();
                 int i;
                 for (i = 0; i < listaClientes.size(); i++) {
-                    boolean state = metodoInsertListaClientes(listaClientes.get(i));
+                    //boolean state = metodoInsertListaClientes(listaClientes.get(i));
+                    boolean state = metodoAtualizarBairroClientes(listaClientes.get(i));
                     if(state){
                         System.out.println("Cliente: " + listaClientes.get(i).getNome() + " Adicionado com sucesso!");
                         int finalI = i;
@@ -110,8 +111,8 @@ public class importarClientesController implements Initializable {
             Cell cellEndereco = sheet.getCell(4, i);
             Cell cellNumero = sheet.getCell(5, i);
             Cell cellBairro = sheet.getCell(6, i);
-            String enderecoCompleto = cellEndereco.getContents() + "," + cellNumero.getContents() + "," + cellBairro.getContents() ;
-            listaTemporaria.add(new Cliente(0, cellNome.getContents(), enderecoCompleto, "Sem Numero Cadastrado", "Usuario Importado", 0));
+            String enderecoCompleto = cellEndereco.getContents().toUpperCase() + "," + cellNumero.getContents();
+            listaTemporaria.add(new Cliente(0, cellNome.getContents(), enderecoCompleto, cellBairro.getContents().toUpperCase(),"Sem Numero Cadastrado", "Usuario Importado", 0));
             System.out.println("Cliente: " + listaTemporaria.get(i).getNome() + " " + listaTemporaria.get(i).getTelefone() + " " + listaTemporaria.get(i).getEndereco() + " " + listaTemporaria.get(i).getData_cadastro());
         }
         workbook.close();
@@ -141,6 +142,28 @@ public class importarClientesController implements Initializable {
         }
         return state;
     }
+    private boolean metodoAtualizarBairroClientes(Cliente cliente) {
+        boolean state = false;
+        String query = null;
+        PreparedStatement preparableStatement = null;
+        try {
+            query = "UPDATE `Clientes` SET `cliente_endereco` =?,`bairro` =? WHERE `cliente_nome` = ?";
+            preparableStatement = connection.prepareStatement(query);
+            preparableStatement.setString(1, cliente.getEndereco());
+            preparableStatement.setString(2, cliente.getBairro());
+            preparableStatement.setString(3, cliente.getNome());
+            int count = preparableStatement.executeUpdate();
+            if(count > 0){
+                state = true;
+            }else {
+                state = false;
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+        return state;
+    }
+
 
     //metodos de negocios
 

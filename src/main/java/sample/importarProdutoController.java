@@ -1,9 +1,8 @@
 package sample;
 
 import com.jfoenix.controls.JFXButton;
-import com.mysql.cj.xdevapi.PreparableStatement;
 import helpers.DefaultComponents;
-import helpers.db_connect;
+import helpers.Database.db_connect;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

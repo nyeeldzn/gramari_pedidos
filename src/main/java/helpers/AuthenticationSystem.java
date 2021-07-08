@@ -1,6 +1,10 @@
 package helpers;
 
+import helpers.Database.db_crud;
 import models.Usuario;
+
+import java.io.*;
+import java.util.Properties;
 
 public class AuthenticationSystem {
 
@@ -49,6 +53,65 @@ public class AuthenticationSystem {
         state = db_crud.metodoUpdateUsuario(user.getUsername().toUpperCase().trim(), password, user.getPriv(), user.getId());
         return state;
     }
+
+    public static String getConfig(String path){
+        File configFile = new File(path);
+        String host = "";
+
+        try {
+            FileReader reader = new FileReader(configFile);
+            Properties props = new Properties();
+            props.load(reader);
+
+            host = props.getProperty("host");
+
+            System.out.print("Host name is: " + host);
+            reader.close();
+        } catch (FileNotFoundException ex) {
+            // file does not exist
+        } catch (IOException ex) {
+            // I/O error
+        }
+
+        return host;
+    }
+    public static void setConfig(String path) throws IOException {
+        Properties defaultProps = new Properties();
+        //set default
+
+        //create main
+
+
+        File configFile = new File("config.properties");
+
+        try {
+            Properties props = new Properties();
+            props.setProperty("host", "www.codejava.net");
+            FileWriter writer = new FileWriter(configFile);
+            props.store(writer, "host settings");
+            writer.close();
+        } catch (FileNotFoundException ex) {
+            // file does not exist
+        } catch (IOException ex) {
+            // I/O error
+        }
+
+        /*
+
+        File configFile = new File(path);
+        FileReader reader = new FileReader(configFile);
+        Properties props = new Properties();
+
+        props.load(reader);
+
+        props.setProperty("host", "localhost");
+
+        FileWriter writer = new FileWriter(configFile);
+        props.store(writer, "config");
+
+         */
+    }
+
 
     public static Usuario getUser() {
         return user;

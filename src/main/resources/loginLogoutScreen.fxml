@@ -92,8 +92,13 @@
             </VBox>
          </center>
          <top>
-            <HBox alignment="CENTER_RIGHT" prefHeight="44.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER_RIGHT" prefHeight="44.0" prefWidth="800.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
+                  <JFXButton fx:id="btnConfig" contentDisplay="CENTER" style="-fx-background-color: WHITE;" text=" ">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="GEAR" size="25" />
+                     </graphic>
+                  </JFXButton>
                   <JFXButton fx:id="btnClose" contentDisplay="CENTER" style="-fx-background-color: WHITE;" text=" ">
                      <graphic>
                         <FontAwesomeIconView glyphName="CLOSE" size="25" />

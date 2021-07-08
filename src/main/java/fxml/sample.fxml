@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXHamburger?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<StackPane fx:id="stackPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.MainController">
+   <children>
+      <BorderPane fx:id="borderPane" prefHeight="200.0" prefWidth="200.0">
+         <top>
+            <VBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox alignment="CENTER_RIGHT">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="GERENCIADOR DE PEDIDOS - SUPERMERCADOS GRAMARI EIRELI" wrappingWidth="736.0654296875" />
+                        <JFXButton fx:id="btnExit" alignment="CENTER" contentDisplay="CENTER" text=" ">
+                           <graphic>
+                              <FontAwesomeIconView  glyphName="CLOSE" size="25" />
+                           </graphic>
+                        </JFXButton>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="200.0" spacing="15.0" style="-fx-background-color: white;">
+                     <children>
+                        <JFXButton fx:id="btnNovoPedido" prefHeight="40.0" prefWidth="173.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 10;" text="NOVO PEDIDO (F1)">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="PLUS" size="20" />
+                           </graphic>
+                        </JFXButton>
+                        <JFXButton fx:id="btnDetalhesPedido" prefHeight="40.0" prefWidth="208.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 10;" text="DETALHES PEDIDO (F2)">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="ARCHIVE" size="20" />
+                           </graphic>
+                        </JFXButton>
+                        <JFXButton fx:id="btnRefresh" prefHeight="40.0" prefWidth="130.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 10;" text="ATUALIZAR">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="REFRESH" size="20" />
+                           </graphic>
+                        </JFXButton>
+                        <JFXButton visible="false" fx:id="btnPerfil" prefHeight="42.0" prefWidth="85.0" style="-fx-background-color: orange;" text="PERFIL" textFill="WHITE">
+                           <HBox.margin>
+                              <Insets left="520.0" />
+                           </HBox.margin>
+                           <graphic>
+                              <FontAwesomeIconView fill="WHITE" glyphName="USER" size="20" />
+                           </graphic>
+                        </JFXButton>
+                        <JFXHamburger fx:id="btnConfig" prefHeight="60.0" prefWidth="51.0" />
+                     </children>
+                     <padding>
+                        <Insets left="10.0" right="10.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </VBox>
+         </top>
+         <center>
+            <StackPane BorderPane.alignment="CENTER">
+               <children>
+                  <BorderPane fx:id="dashBoard" prefHeight="200.0" prefWidth="200.0" />
+                  <HBox fx:id="mainCenter" alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" spacing="20.0" style="-fx-background-color: white;">
+                     <children>
+                        <VBox prefHeight="620.0" prefWidth="380.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;">
+                           <children>
+                              <StackPane prefHeight="60.0" prefWidth="380.0" style="-fx-background-color: white; -fx-background-radius: 15;">
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="PEDIDOS PENDENTES" textAlignment="CENTER" wrappingWidth="285.21875">
+                                       <font>
+                                          <Font name="System Bold" size="22.0" />
+                                       </font>
+                                    </Text>
+                                 </children>
+                              </StackPane>
+                              <Separator prefWidth="200.0" />
+                              <TableView fx:id="tablePedido" prefHeight="530.0" prefWidth="380.0" style="-fx-background-color: white;">
+                                 <columns>
+                                    <TableColumn fx:id="idCol" minWidth="0.0" prefWidth="35.0" sortType="DESCENDING" text="ID" />
+                                    <TableColumn fx:id="nomeCol" minWidth="0.0" prefWidth="128.0" text="NOME" />
+                                    <TableColumn fx:id="telCol" minWidth="0.0" prefWidth="124.0" text="TELEFONE" />
+                                    <TableColumn fx:id="statusCol" minWidth="0.0" text="STATUS" />
+                                 </columns>
+                                 <padding>
+                                    <Insets left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </TableView>
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="640.0" prefWidth="380.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;">
+                           <children>
+                              <StackPane prefHeight="60.0" prefWidth="380.0" style="-fx-background-color: white; -fx-background-radius: 15;">
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="PEDIDOS EM TRIAGEM" textAlignment="CENTER" wrappingWidth="285.21875">
+                                       <font>
+                                          <Font name="System Bold" size="22.0" />
+                                       </font>
+                                    </Text>
+                                 </children>
+                              </StackPane>
+                              <Separator prefWidth="200.0" />
+                              <TableView fx:id="tablePedidoTriagem" prefHeight="521.0" prefWidth="380.0" style="-fx-background-color: white;">
+                                 <columns>
+                                    <TableColumn fx:id="idColTriagem" prefWidth="28.0" sortType="DESCENDING" text="ID" />
+                                    <TableColumn fx:id="nomeColTriagem" prefWidth="141.0" text="NOME" />
+                                    <TableColumn fx:id="dataColTriagem" prefWidth="85.0" text="H. TRIAGEM" />
+                                    <TableColumn fx:id="statusColTriagem" prefWidth="111.0" text="STATUS" />
+                                 </columns>
+                                 <padding>
+                                    <Insets left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </TableView>
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="640.0" prefWidth="380.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;">
+                           <children>
+                              <StackPane prefHeight="60.0" prefWidth="380.0" style="-fx-background-color: white; -fx-background-radius: 15;">
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="PEDIDOS FINALIZADOS" textAlignment="CENTER" wrappingWidth="285.21875">
+                                       <font>
+                                          <Font name="System Bold" size="22.0" />
+                                       </font>
+                                    </Text>
+                                 </children>
+                              </StackPane>
+                              <Separator prefWidth="200.0" />
+                              <TableView fx:id="tablePedidoFinalizado" prefHeight="526.0" prefWidth="380.0" style="-fx-background-color: white;">
+                                 <columns>
+                                    <TableColumn fx:id="idColFinalizado" prefWidth="30.0" sortType="DESCENDING" text="ID" />
+                                    <TableColumn fx:id="nomeColFinalizado" prefWidth="120.0" text="NOME" />
+                                    <TableColumn fx:id="dataColFinalizado" prefWidth="101.0" text="H. FINALIZAÇÃO" />
+                                    <TableColumn fx:id="statusColFinalizado" prefWidth="116.0" text="STATUS" />
+                                 </columns>
+                                 <padding>
+                                    <Insets left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" top="10.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </StackPane>
+         </center></BorderPane>
+   </children>
+</StackPane>

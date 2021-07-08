@@ -13,7 +13,23 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
+    <repositories>
+
+        <repository>
+            <id>AsposeJavaAPI</id>
+            <name>Aspose Java API</name>
+            <url>https://repository.aspose.com/repo/</url>
+        </repository>
+
+    </repositories>
+
     <dependencies>
+
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-pdf</artifactId>
+            <version>21.2</version>
+        </dependency>
 
         <dependency>
             <groupId>com.jfoenix</groupId>

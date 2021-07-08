@@ -2,11 +2,7 @@ package sample;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import com.mysql.cj.xdevapi.Client;
-import helpers.db_connect;
-import helpers.intentData;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import helpers.Database.db_connect;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
@@ -87,6 +83,7 @@ public class edtClienteAlert implements Initializable {
                resultSet.getInt("id"),
                     resultSet.getString("cliente_nome"),
                     resultSet.getString("cliente_endereco") ,
+                    resultSet.getString("bairro"),
                     resultSet.getString("cliente_telefone"),
                     resultSet.getString("data_cadastro"),
                     resultSet.getInt("qtdPedidos")

@@ -1,4 +1,4 @@
-package helpers;
+package helpers.Database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,13 +7,25 @@ import java.sql.SQLException;
 public class db_connect {
 
 
-    private static String HOST = "localhost";
+    private static String HOST = "";
     private static int PORT = 3306;
     private static String DB_NAME = "pedidos";
     private static String url = "jdbc:mysql://" + HOST + "/" + DB_NAME;
-    private static String USERNAME = "root";
-    private static String PASSWORD = "";
+    //private static String USERNAME = "root";
+    //private static String PASSWORD = "";
+    private static String USERNAME = "client";
+    private static String PASSWORD = "GExYDyvXw2NTzP3p";
     private static Connection connection;
+
+    public static void setHOST(String host) {
+        HOST = host;
+        System.out.println("HOST DEFINIDO PARA: " + host);
+    }
+
+    public static String getHost (){
+       String host = HOST;
+       return host;
+    }
 
     public static Connection getConnect (){
         try {

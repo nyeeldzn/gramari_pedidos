@@ -2,6 +2,8 @@ package sample;
 
 import com.jfoenix.controls.*;
 import helpers.*;
+import helpers.Database.db_connect;
+import helpers.Database.db_crud;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -105,7 +107,7 @@ public class clientesController implements Initializable {
 
         ObservableList<Cliente> listaClientes = FXCollections.observableArrayList();
         ObservableList<String> listaComboBox = FXCollections.observableArrayList(
-          "Pedidos Pendentes","Pedidos em Triagem","Pedidos Finalizados", "Todos"
+          "Pedidos Pendentes","Pedidos em Triagem","Pedidos Finalizados"
         );
         ObservableList<String> listaQuerys = FXCollections.observableArrayList(
                 "Ordem_De_Pedido","Ordem_De_Pedido_Triagem","Ordem_De_Pedido_Finalizado"
@@ -537,74 +539,23 @@ public class clientesController implements Initializable {
                     case 0:
                         System.out.println("Buscando nos Pedidos de Entrada");
                         query = "SELECT * FROM `Pedidos` WHERE `data_entrada` >= ? AND `data_entrada` <= ? AND `cliente_id` =? AND `status_id` =?";
-                        listaPedidos = recuperarPedidosPorData(query, "1");
+                        listaPedidos = db_crud.recuperarPedidosDeClientePorData(query, cliente.getId(), "1", dataInicial, dataFinal);
                         tableViewPedidos.setItems(listaPedidos);
                         break;
                     case 1:
                         System.out.println("Buscando nos Pedidos em Triagem");
                         query = "SELECT * FROM `Pedidos` WHERE `data_entrada` >= ? AND `data_entrada` <= ? AND `cliente_id` =? AND `status_id` =?";
-                        listaPedidosTriagem = recuperarPedidosPorData(query, "2");
+                        listaPedidosTriagem = db_crud.recuperarPedidosDeClientePorData(query, cliente.getId(), "2", dataInicial, dataFinal);
                         tableViewPedidos.setItems(listaPedidosTriagem);
                         break;
                     case 2:
                         System.out.println("Buscando nos Pedidos Finalizados");
                         query = "SELECT * FROM `Pedidos` WHERE `data_entrada` >= ? AND `data_entrada` <= ? AND `cliente_id` =? AND `status_id` =?";
-                        listaPedidosFinalizados = recuperarPedidosPorData(query, "3");
+                        listaPedidosFinalizados = db_crud.recuperarPedidosDeClientePorData(query, cliente.getId(), "3", dataInicial, dataFinal);
                         tableViewPedidos.setItems(listaPedidosFinalizados);
                         break;
-                    case 3:
-                        listaPedidosTodos.clear();
-                        System.out.println("Buscando em todos os status");
-                        query = "SELECT * FROM `Pedidos` WHERE `data_entrada` >= ? AND `data_entrada` <= ? AND `cliente_id` =?";
-                        listaPedidosTodos = recuperarPedidosPorData(query, "");
-                                    tableViewPedidos.setItems(listaPedidosTodos);
-                                    break;
+
                 }
-            }
-            private ObservableList<OrdemPedido> recuperarPedidosPorData(String query, String table) throws SQLException{
-                ObservableList<OrdemPedido> lista = FXCollections.observableArrayList();
-                lista.clear();
-                System.out.println("Cliente: " + cliente.getNome() + " " + "ID: " + cliente.getId());
-                System.out.println("Data Inicial de busca: " + dataInicial + "Data final de busca: " + dataFinal);
-                connection = db_connect.getConnect();
-                preparedStatement = connection.prepareStatement(query);
-                if(!(table.equals(""))) {
-                    preparedStatement.setString(1, dataInicial);
-                    preparedStatement.setString(2, dataFinal);
-                    preparedStatement.setInt(3, cliente.getId());
-                    preparedStatement.setString(4, table);
-                }else if(table.equals("")){
-                    preparedStatement.setString(1, dataInicial);
-                    preparedStatement.setString(2, dataFinal);
-                    preparedStatement.setInt(3, cliente.getId());
-                }
-                // preparedStatement.setString(2, dataFinal);
-                resultSet = preparedStatement.executeQuery();
-                while(resultSet.next()){
-                    lista.add(new OrdemPedido(resultSet.getInt("id"),
-                            resultSet.getInt("id"),
-                            resultSet.getString("cliente_nome"),
-                            resultSet.getString("cliente_endereco"),
-                            resultSet.getString("cliente_telefone"),
-                            resultSet.getString("forma_envio"),
-                            resultSet.getString("forma_pagamento"),
-                            resultSet.getString("forma_subst"),
-                            resultSet.getString("data_entrada"),
-                            resultSet.getString("horario_entrada"),
-                            resultSet.getString("horario_triagem"),
-                            resultSet.getString("horario_checkout"),
-                            resultSet.getString("horario_finalizado"),
-                            resultSet.getInt("operador_id"),
-                            resultSet.getInt("entregador_id"),
-                            resultSet.getString("fonte_pedido"),
-                            resultSet.getString("status"),
-                            resultSet.getDouble("troco"),
-                            resultSet.getString("caixa_responsavel"),
-                            resultSet.getInt("status_id")
-                    ));
-                    System.out.println(resultSet.getString("cliente_nome"));
-                }
-                return lista;
             }
             private void recuperarClientes() throws SQLException {
                 query = "SELECT * FROM `Clientes`";
@@ -616,6 +567,7 @@ public class clientesController implements Initializable {
                                 resultSet.getInt("id"),
                                 resultSet.getString("cliente_nome"),
                                 resultSet.getString("cliente_endereco"),
+                                resultSet.getString("bairro"),
                                 resultSet.getString("cliente_telefone"),
                                 resultSet.getString("data_cadastro"),
                                 resultSet.getInt("qtdPedidos")
@@ -665,13 +617,14 @@ public class clientesController implements Initializable {
                 }
             return updateState;
             }
-            private void insertClienteTodosCampos(String query, String nome, String telefone, String enderco, int id) throws SQLException {
+            private void insertClienteTodosCampos(String query, String nome, String bairro, String telefone, String enderco, int id) throws SQLException {
                 connection = db_connect.getConnect();
                 preparedStatement = connection.prepareStatement(query);
                 preparedStatement.setString(1, nome);
                 preparedStatement.setString(2, enderco);
-                preparedStatement.setString(3, telefone);
-                preparedStatement.setInt(4, id);
+                preparedStatement.setString(3, bairro);
+                preparedStatement.setString(4, telefone);
+                preparedStatement.setInt(5, id);
                 int count = preparedStatement.executeUpdate();
                 if(count > 0){
                     System.out.println("Update feita com sucesso");
@@ -712,6 +665,8 @@ public class clientesController implements Initializable {
 
                 JFXTextField edtTelefone = textFieldPadrao(150);
                 JFXTextField edtEndereco = textFieldPadrao(550);
+                JFXTextField edtBairro = textFieldPadrao(150);
+
 
                 HBox row1 = defaultHBox();
                 HBox row2 = defaultHBox();
@@ -731,7 +686,8 @@ public class clientesController implements Initializable {
                 );
                 R2C1.getChildren().addAll(
                         defaultText("ENDEREÇO"),
-                        edtEndereco
+                        edtEndereco,
+                        edtBairro
                 );
 
                 row1.getChildren().addAll(
@@ -754,16 +710,19 @@ public class clientesController implements Initializable {
                 edtNome.setText(cliente.getNome());
                 edtTelefone.setText(cliente.getTelefone());
                 edtEndereco.setText(cliente.getEndereco());
+                edtBairro.setText(cliente.getBairro());
                 btnSalvar.setOnAction((e) -> {
                     System.out.println("Iniciando verificação");
                     int id = cliente.getId();
                     String nome = edtNome.getText().toUpperCase().trim();
                     String telefone = edtTelefone.getText().toUpperCase().trim();
                     String endereco = edtEndereco.getText().toUpperCase().trim();
+                    String bairro = edtBairro.getText().toUpperCase().trim();
                     String query = null;
                     if(!(nome.equals(cliente.getNome().toUpperCase().trim()))
                             && telefone.equals(cliente.getTelefone().trim())
-                            && endereco.equals(cliente.getEndereco().toUpperCase().trim())){
+                            && endereco.equals(cliente.getEndereco().toUpperCase().trim())
+                            && bairro.equals(cliente.getBairro().toUpperCase().trim())){
                         System.out.println("Setando query");
                         query = "UPDATE `Clientes` SET `cliente_nome` =? WHERE `id`=?";
                         try {
@@ -773,7 +732,8 @@ public class clientesController implements Initializable {
                         }
                     }else if(!(telefone.equals(cliente.getTelefone().trim()))
                             && nome.equals(cliente.getNome().toUpperCase().trim())
-                            && endereco.equals(cliente.getEndereco().toUpperCase().trim())){
+                            && endereco.equals(cliente.getEndereco().toUpperCase().trim())
+                            && bairro.equals(cliente.getBairro().toUpperCase().trim())){
                         query = "UPDATE `Clientes` SET `cliente_telefone` = ? WHERE `id` = ?";
                         System.out.println("Novo: " + telefone + " Anterior:" + cliente.getTelefone().trim());
                         System.out.println("String nova: " + telefone.length() + " String anterior: " + cliente.getTelefone().trim().length());
@@ -791,12 +751,22 @@ public class clientesController implements Initializable {
                         } catch (SQLException exception) {
                             exception.printStackTrace();
                         }
+                    }else if(!(bairro.equals(cliente.getBairro().toUpperCase().trim()))
+                            && nome.equals(cliente.getNome().toUpperCase().trim())
+                            && telefone.equals(cliente.getTelefone().trim())
+                            && endereco.equals(cliente.getEndereco().toUpperCase().trim())){
+                        query = "UPDATE `Clientes` SET `bairro` = ? WHERE `id` = ?";
+                        try {
+                            insertCliente(query, bairro, id);
+                        } catch (SQLException exception) {
+                            exception.printStackTrace();
+                        }
                     }else if(!(nome.equals(cliente.getNome().toUpperCase().trim()))
                             && !(telefone.equals(cliente.getTelefone().toUpperCase().trim()))
                             && !(endereco.equals(cliente.getEndereco().toUpperCase().trim()))){
                         String queryModel = "UPDATE `Clientes` SET `cliente_nome` =?, `cliente_endereco` =?, `cliente_telefone` = ? WHERE `id`=?";
                         try {
-                            insertClienteTodosCampos(queryModel,nome,telefone,endereco, id);
+                            insertClienteTodosCampos(queryModel,nome,telefone, bairro, endereco, id);
                         } catch (SQLException exception) {
                             exception.printStackTrace();
                         }

@@ -1,21 +1,29 @@
 package sample;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.jfoenix.controls.*;
 import helpers.*;
-import javafx.application.Platform;
+import helpers.Database.db_connect;
+import helpers.Database.db_crud;
+import helpers.Database.PedidoProduto.pedido_crud;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -31,7 +39,6 @@ import models.Produto;
 import models.ProdutoPedido;
 import models.Usuario;
 
-import java.awt.print.*;
 import java.io.*;
 import java.net.URL;
 import java.sql.Connection;
@@ -40,13 +47,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static helpers.DataManagerAnalytcs.createEstatistica;
+import static helpers.UI.Loading.newLoadingCircular;
 
 public class  detalhesPedidoController implements Initializable {
 
@@ -61,6 +68,9 @@ public class  detalhesPedidoController implements Initializable {
 
     @FXML
     private JFXButton btnAtualizarLista;
+
+    @FXML
+    private JFXTextArea edtObservacao;
 
     @FXML
     private TableView<ProdutoPedido> tableProdutos;
@@ -119,6 +129,7 @@ public class  detalhesPedidoController implements Initializable {
     Usuario user;
 
     ArrayList<Produto> produtos = new ArrayList();
+    List<String> nomesProdutos = new ArrayList();
     ObservableList<ProdutoPedido> produtosPedido = FXCollections.observableArrayList();
 
 
@@ -131,23 +142,45 @@ public class  detalhesPedidoController implements Initializable {
     PreparedStatement preparedStatementPedidoProduto = null;
 
     ResultSet resultSet = null;
+    VBox loading = new VBox();
+    ProgressBar bar = new ProgressBar();
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        recuperarUsuario();
-        try {
-            recuperarIntentProdUid();
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }
+        //loading = newLoadingCircular(stackPane, "src/main/resources/loading.gif");
+        //setLoadingCircular(loading, stackPane);
 
-        try {
-            recuperarProdutosPedido();
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }
+        Task task = new Task<Void>() {
+            @Override public Void call() {
+                recuperarUsuario();
+                try {
+                    recuperarIntentProdUid();
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
 
-        setupComponentes();
+                try {
+                    recuperarProdutosPedido();
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+
+                setupComponentes();
+
+                return null;
+            }
+        };
+
+        loading = newLoadingCircular(stackPane);
+        stackPane.getChildren().add(loading);
+        task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                loading.setVisible(false);
+            }
+        });
+        new Thread(task).start();
 
     }
 
@@ -155,34 +188,7 @@ public class  detalhesPedidoController implements Initializable {
         user = AuthenticationSystem.getUser();
     }
 
-    private void setupEdt() {
-        ArrayList<String> nomes = new ArrayList<>();
-        for(int i = 0; i<produtos.size(); i++){
-            nomes.add(produtos.get(i).getNome());
-        }
 
-        JFXAutoCompletePopup<String> autoCompletePopup = new JFXAutoCompletePopup<>();
-        autoCompletePopup.setPrefWidth(500);
-        autoCompletePopup.getSuggestions().addAll(nomes);
-
-        autoCompletePopup.setSelectionHandler(event -> {
-            edtNomeProduto.setText(event.getObject());
-            edtQTD.requestFocus();
-            // you can do other actions here when text completed
-        });
-
-        // filtering options
-        edtNomeProduto.textProperty().addListener(observable -> {
-            autoCompletePopup.filter(string -> string.toLowerCase().contains(edtNomeProduto.getText().toLowerCase()));
-            if (autoCompletePopup.getFilteredSuggestions().isEmpty() || edtNomeProduto.getText().isEmpty()) {
-                autoCompletePopup.hide();
-                // if you remove textField.getText.isEmpty() when text field is empty it suggests all options
-                // so you can choose
-            } else {
-                autoCompletePopup.show(edtNomeProduto);
-            }
-        });
-    }
 
     //Metodos Iniciais
     private void setupComponentes() {
@@ -288,10 +294,7 @@ public class  detalhesPedidoController implements Initializable {
         });
         btnImprimir.setOnAction((e) -> {
             if(UserPrivilegiesVerify.permissaoVerBotao(user, 1) == true){
-                File file = DefaultComponents.fileChooserSave(stackPane, "PDF files (*.pdf)", "*.pdf");
-                if(file != null){
-                    criarPDF(file);
-                }
+                criarPDF();
             }else{
                 JFXDialog dialog = AlertDialogModel.alertDialogErro("Você não tem permissão para isso.",stackPane);
                 dialog.show();
@@ -331,6 +334,34 @@ public class  detalhesPedidoController implements Initializable {
         });
 
     }
+    private void setupEdt() {
+        ArrayList<String> nomes = new ArrayList<>();
+        for(int i = 0; i<produtos.size(); i++){
+            nomes.add(produtos.get(i).getNome());
+        }
+
+        JFXAutoCompletePopup<String> autoCompletePopup = new JFXAutoCompletePopup<>();
+        autoCompletePopup.setPrefWidth(500);
+        autoCompletePopup.getSuggestions().addAll(nomes);
+
+        autoCompletePopup.setSelectionHandler(event -> {
+            edtNomeProduto.setText(event.getObject());
+            edtQTD.requestFocus();
+            // you can do other actions here when text completed
+        });
+
+        // filtering options
+        edtNomeProduto.textProperty().addListener(observable -> {
+            autoCompletePopup.filter(string -> string.toLowerCase().contains(edtNomeProduto.getText().toLowerCase()));
+            if (autoCompletePopup.getFilteredSuggestions().isEmpty() || edtNomeProduto.getText().isEmpty()) {
+                autoCompletePopup.hide();
+                // if you remove textField.getText.isEmpty() when text field is empty it suggests all options
+                // so you can choose
+            } else {
+                autoCompletePopup.show(edtNomeProduto);
+            }
+        });
+    }
 
     private void removerProduto() {
         query = "DELETE FROM `Pedido_Produto` WHERE `produto_index` =? AND `pedido_index` =?";
@@ -361,13 +392,17 @@ public class  detalhesPedidoController implements Initializable {
         }
     }
 
-    private void criarPDF(File file) {
-        Document document = new Document();
+    private void criarPDF() {
+        //Rectangle rec = new Rectangle(160,160);
+        Document document = new Document(PageSize.A6);
+        File file = DefaultComponents.fileChooserSave(stackPane, "ARQUIVO PDF", "*.pdf");
         int size = produtosPedido.size();
 
         try {
             PdfWriter.getInstance(document, new FileOutputStream(file.getAbsolutePath()));
             document.open();
+
+            //document.setPageSize(new Rectangle(160,160));
 
             // adicionando um parágrafo no documento
             document.add(new Paragraph("=============================="));
@@ -395,11 +430,13 @@ public class  detalhesPedidoController implements Initializable {
             document.add(new Paragraph("-F. Pedido: " + pedido.getFonte_pedido()));
             document.add(new Paragraph("=============================="));
 
+
         }catch (DocumentException | FileNotFoundException de) {
             de.printStackTrace();
         }
         document.close();
     }
+
 
     private void recuperarIntentProdUid() throws SQLException {
         String id;
@@ -426,7 +463,8 @@ public class  detalhesPedidoController implements Initializable {
                             resultSet.getString("nome_produto")
                     )
             );
-            System.out.println("Produto recuperado: " + resultSet.getString("nome_produto"));
+            nomesProdutos.add(resultSet.getString("nome_produto"));
+            //System.out.println("Produto recuperado: " + resultSet.getString("nome_produto"));
         }
     }
     private void recuperarProdutosPedido() throws SQLException {
@@ -457,6 +495,7 @@ public class  detalhesPedidoController implements Initializable {
             System.out.println("Produto do Pedido: " + resultSet.getString("produto_nome") + " Quantidade: " + resultSet.getInt("quantidade"));
         }
         tableProdutos.setItems(produtosPedido);
+
     }
     private void recuperarProdutoCriado(String nome) throws SQLException {
         query = "SELECT * FROM `Produto` WHERE nome_produto = ?";
@@ -470,7 +509,7 @@ public class  detalhesPedidoController implements Initializable {
             produto = new Produto(id, nome_produto);
             System.out.println("Produto criado com ID: " + produto.getId() + "com Nome: " + produto.getNome());
         }
-        addproduto_pedido(produto.getId(), produto.getNome());
+        pedido_crud.addproduto_pedido(produto.getId(), pedido.getId(), produto.getNome(), Integer.parseInt(edtQTD.getText()));
     }
     private void recuperarDadosPedido() throws SQLException {
 
@@ -488,14 +527,15 @@ public class  detalhesPedidoController implements Initializable {
                         resultSet.getInt("cliente_id"),
                         resultSet.getString("cliente_nome"),
                         resultSet.getString("cliente_endereco"),
+                        resultSet.getString("bairro"),
                         resultSet.getString("cliente_telefone"),
                         resultSet.getString("forma_envio"),
                         resultSet.getString("forma_pagamento"),
-                        resultSet.getString("forma_subst"),
                         resultSet.getString("data_entrada"),
                         resultSet.getString("horario_entrada"),
                         resultSet.getString("horario_triagem"),
                         resultSet.getString("horario_checkout"),
+                        resultSet.getString("horario_saida"),
                         resultSet.getString("horario_finalizado"),
                         resultSet.getInt("operador_id"),
                         resultSet.getInt("entregador_id"),
@@ -514,65 +554,79 @@ public class  detalhesPedidoController implements Initializable {
     //Metodos Iniciais
 
     //Metodos de Negocios
-    private void addproduto_pedido(int id, String nome) {
-        int quantidade = Integer.parseInt(edtQTD.getText());
-        System.out.println("Produto de ID: " + id + "Nome: " + nome + " sendo adicionado ao pedido...");
-        pedido_Produto_query = "INSERT INTO `Pedido_Produto`(`id`, `pedido_index`, `produto_index`,`produto_nome`,  `quantidade`) VALUES (?,?,?,?,?)";
-        try {
-            preparedStatementPedidoProduto = connection.prepareStatement(pedido_Produto_query);
-            preparedStatementPedidoProduto.setInt(1, 0);
-            preparedStatementPedidoProduto.setInt(2, Integer.parseInt(pedido_id)); // pedido index
-            preparedStatementPedidoProduto.setInt(3, id); // produto index
-            preparedStatementPedidoProduto.setString(4, nome); // produto nome
-            preparedStatementPedidoProduto.setInt(5, quantidade); // quantidade
-            int count = preparedStatementPedidoProduto.executeUpdate();
-            if(count > 0){
-                System.out.println("Produto adicionado");
-                restartAdd();
-            }else
-                {
-                    System.out.println("Houve um problema");
-                }
-        }catch (SQLException ex){
-            Logger.getLogger(novoPedidoController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+
     private void salvarProduto(){
+
         connection = db_connect.getConnect();
 
         prod_nome = edtNomeProduto.getText().toUpperCase().trim();
-
         if(prod_nome.isEmpty()){
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(null);
             alert.setContentText("Preencha todos os Dados!");
             alert.showAndWait();
         }else{
-            for(int i = 1; i<produtos.size(); i++){
-                int id = produtos.get(i).getId();
-                String nomerecup = produtos.get(i).getNome().toUpperCase().trim();
 
-                System.out.println(nomerecup);
-                System.out.println(prod_nome);
-                System.out.println(i);
+            new Service<Optional<Produto>>() {
 
-                System.out.println(produtos.size());
+                @Override
+                public void start() {
+                    super.start();
+                    //pre
+                    //set UI
+                    System.out.print("Iniciando Task: Iniciando Loading");
+                    loading.setVisible(true);
+                    //bar.progressProperty().bind(createTask().progressProperty());
+                }
 
-                if(nomerecup.equals(prod_nome)){
-                    System.out.println("Finalizando for, adcionando produto.");
-                    i = produtos.size();
-                    System.out.println("ArraySize " + produtos.size() + "For size " + i);
-                    addproduto_pedido(id, nomerecup.toUpperCase().trim());
-                }else if(!(nomerecup.equals(prod_nome))){
-                    if(i == produtos.size() - 1 && !(prod_nome.equals(nomerecup))){
-                        System.out.println("Criando novo produto, finalizando for");
-                        i = i + 1;
+                @Override
+                protected Task<Optional<Produto>> createTask() {
+                    return new Task<Optional<Produto>>() {
+
+                        @Override
+                        protected Optional<Produto> call() throws Exception {
+                            //func
+                            System.out.println("Realizando Operações");
+                            Optional<Produto> produto = produtos
+                                    .stream()
+                                    .filter(d -> d.getNome().toUpperCase().equals(prod_nome))
+                                    .findFirst();
+                            return produto;
+                        }
+
+                    };
+                }
+
+                @Override
+                protected void succeeded() {
+                    super.succeeded();
+                    //after
+                    System.out.println("Task finalizada");
+                    Optional<Produto> prod = getValue();
+                    if(prod.get() != null){
+                        System.out.println("Adicionando produto ao pedido");
+                        boolean state = pedido_crud.addproduto_pedido(prod.get().getId(), pedido.getId(), prod.get().getNome(), Integer.parseInt(edtQTD.getText()));
+                        if(state){
+                            try {
+                                loading.setVisible(false);
+                                restartAdd();
+                            } catch(SQLException ex){
+                                loading.setVisible(false);
+                                ex.printStackTrace();
+                            }
+                        }
+                    }else{
+                        System.out.println("Criando novo produto");
+                        loading.setVisible(false);
                         insertProduto();
                     }
+
                 }
-            }
+
+            }.start();
 
         }
+
     }
     private void insertProduto() {
         boolean state = db_crud.insertProduto(Integer.parseInt("0"), prod_nome);
@@ -638,14 +692,6 @@ public class  detalhesPedidoController implements Initializable {
         System.out.println(dateFormat.format(date));
         horario_atual = dateFormat.format(date);
 
-        OrdemPedido pedidoAtualizado = new OrdemPedido(
-                pedido.getId(), pedido.getCliente_id(), pedido.getCliente_nome(), pedido.getEnd_cliente(), pedido.getNum_cliente(),
-                pedido.getForma_envio(), pedido.getForma_pagamento(), pedido.getForma_subst(), pedido.getData_entrada(),
-                pedido.getHorario_entrada(), horario_atual, pedido.getHorario_checkout(),
-                pedido.getHorario_finalizado(), pedido.getOperador_id(), pedido.getEntregador_id(), pedido.getFonte_pedido(),
-                pedido.getStatus(), pedido.getTroco(), pedido.getCaixa_responsavel(), pedido.getStatus_id()
-        );
-
         if (table_index == 1) {
             System.out.println("Iniciando INSERT Pedido Triagem");
             query = "UPDATE `Pedidos` SET `status_id` = ? WHERE `id` =? ";
@@ -665,13 +711,12 @@ public class  detalhesPedidoController implements Initializable {
             }
 
         } else if (table_index == 2) {
-            System.out.println("Iniciando UPDATE Pedido horario checkout");
-            if (pedido.getHorario_checkout().equals("")) {
+            if (pedido.getHorario_checkout().equals("") && !(pedido.getHorario_triagem().equals(""))) {
                 query = "UPDATE `Pedidos` SET `horario_checkout`=? WHERE `id` =?";
                 boolean state = db_crud.metodoAtualizarPedido(pedido.getId(), horario_atual, query);
                 if (state == true) {
                     query = "UPDATE `Pedidos` SET `status` =? WHERE `id` =?";
-                    boolean state2 = db_crud.metodoAtualizarPedido(pedido.getId(), "Saiu para Entrega", query);
+                    boolean state2 = db_crud.metodoAtualizarPedido(pedido.getId(), "Aguardando Entrega", query);
                     if (state2 == true) {
                         query = "UPDATE `Pedidos` SET `caixa_responsavel` =? WHERE `id` =?";
                         alertDialogProdutos(pedido.getId(), query);
@@ -682,7 +727,22 @@ public class  detalhesPedidoController implements Initializable {
                     dialog.show();
                 }
             } else {
-                if (pedido.getHorario_checkout().equals("") == false) {
+                if (!(pedido.getHorario_checkout().equals("")) && pedido.getHorario_saidaentrega().equals("")) {
+                    query = "UPDATE `Pedidos` SET `status` = ? WHERE `id` =? ";
+                    boolean state2 = db_crud.metodoAtualizarPedido(Integer.parseInt(pedido_id), "Saiu para Entrega", query);
+                    if (state2 == true) {
+                        query = "UPDATE `Pedidos` SET `horario_saida` = ? WHERE `id` =? ";
+                        boolean state3 ;
+                        state3 = db_crud.metodoAtualizarPedido(Integer.parseInt(pedido_id), horario_atual, query);
+                        if (state3 == true) {
+                            fecharJanela();
+                            //fechar dialog
+                        }
+                    } else {
+                        JFXDialog dialog = AlertDialogModel.alertDialogErro("Houve um problema ao tentar atualizar o pedido", stackPane);
+                        dialog.show();
+                    }
+                }else if(!(pedido.getHorario_saidaentrega().equals(""))){
                     System.out.println("Iniciando INSERT nos finalizados");
                     query = "UPDATE `Pedidos` SET `status_id` = ? WHERE `id` =? ";
                     boolean state = db_crud.metodoAtualizarPedido(Integer.parseInt(pedido_id), "3", query);
@@ -770,18 +830,28 @@ public class  detalhesPedidoController implements Initializable {
         recuperarProdutosPedido();
     }
     private void setarDados() {
+        edtObservacao.setText(db_crud.getPedidoObservacao(pedido.getId()));
         textNome.setText(pedido.getCliente_nome());
-        textEndereco.setText(pedido.getEnd_cliente());
+        textEndereco.setText(pedido.getEnd_cliente() + "Bairro: " + pedido.getBairro());
         textEnvio.setText(pedido.getForma_envio());
         textPagamento.setText(pedido.getForma_pagamento());
         textTelefone.setText(pedido.getNum_cliente());
         textData_Entrada.setText(pedido.getData_entrada());
-
+        //edtObservacao.setText(pedido.);
     }
     private void fecharJanela(){
         Stage stage = (Stage) stackPane.getScene().getWindow();
         stage.getOnCloseRequest().handle(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
         stage.close();
+    }
+
+
+    private void setLoadingCircular(Node node, StackPane stackPane){
+        stackPane.getChildren().add(node);
+    }
+
+    private void removeLoadingCircular(Node node, StackPane stackPane){
+        stackPane.getChildren().remove(node);
     }
 
     //Metodos de Controle

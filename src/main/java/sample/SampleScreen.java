@@ -27,11 +27,6 @@ public class SampleScreen implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        array.add(new Cliente(0,"Daniel","","","",4));
-        array.add(new Cliente(1,"Floriza","","","",5));
-        array.add(new Cliente(2,"Fernando","","","",0));
-        array.add(new Cliente(3,"Rafael","","","",3));
-        array.add(new Cliente(4,"Joao","","","", 3));
 
         ArrayList<String> nomes = new ArrayList<>();
         for(int i = 0; i<array.size(); i++){

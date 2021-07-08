@@ -2,7 +2,7 @@ package sample;
 
 import com.jfoenix.controls.*;
 import helpers.DefaultComponents;
-import helpers.db_connect;
+import helpers.Database.db_crud;
 import helpers.intentData;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -34,9 +34,6 @@ import models.OrdemPedido;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -98,12 +95,8 @@ public class pedidosController implements Initializable {
     private TableColumn<OrdemPedido, String> finalizadoCol;
 
     int cb_selectedIndex = 0;
-    boolean useDatas = false;
     String dataInicial;
     String dataFinal;
-    Connection connection = null;
-    PreparedStatement preparedStatement = null;
-    ResultSet resultSet = null;
 
     ObservableList<OrdemPedido> listaPedidosTodos = FXCollections.observableArrayList();
     ObservableList<OrdemPedido> listaPedidosEntrada = FXCollections.observableArrayList();
@@ -328,51 +321,7 @@ public class pedidosController implements Initializable {
         }
         return sdf.format(d);
     }
-    private ObservableList<OrdemPedido> recuperarPedidosPorData(String query, String table) throws SQLException {
-        ObservableList<OrdemPedido> lista = FXCollections.observableArrayList();
-        lista.clear();
-        System.out.println("Data Inicial de busca: " + dataInicial + "Data final de busca: " + dataFinal);
-        connection = db_connect.getConnect();
-        preparedStatement = connection.prepareStatement(query);
-        if(checkBoxDatas.isSelected() == true && cb_selectedIndex != 3){
-            preparedStatement.setString(1, table);
-            preparedStatement.setString(2, dataInicial);
-            preparedStatement.setString(3, dataFinal);
-        }else if (checkBoxDatas.isSelected() == true && cb_selectedIndex == 3){
-            preparedStatement.setString(1, dataInicial);
-            preparedStatement.setString(2, dataFinal);
-        }
-        if(checkBoxDatas.isSelected() == false && cb_selectedIndex != 3){
-            preparedStatement.setString(1, table);
-        }
-        resultSet = preparedStatement.executeQuery();
-        while(resultSet.next()){
-            lista.add(new OrdemPedido(
-                    resultSet.getInt("id"),
-                    resultSet.getInt("cliente_id"),
-                    resultSet.getString("cliente_nome"),
-                    resultSet.getString("cliente_endereco"),
-                    resultSet.getString("cliente_telefone"),
-                    resultSet.getString("forma_envio"),
-                    resultSet.getString("forma_pagamento"),
-                    resultSet.getString("forma_subst"),
-                    resultSet.getString("data_entrada"),
-                    resultSet.getString("horario_entrada"),
-                    resultSet.getString("horario_triagem"),
-                    resultSet.getString("horario_checkout"),
-                    resultSet.getString("horario_finalizado"),
-                    resultSet.getInt("operador_id"),
-                    resultSet.getInt("entregador_id"),
-                    resultSet.getString("fonte_pedido"),
-                    resultSet.getString("status"),
-                    resultSet.getDouble("troco"),
-                    resultSet.getString("caixa_responsavel"),
-                    resultSet.getInt("status_id")
-            ));
-            System.out.println(resultSet.getString("cliente_nome"));
-        }
-        return lista;
-    }
+
     private void switchQuery() throws SQLException {
         String query;
         if(checkBoxDatas.isSelected() == true) {
@@ -381,19 +330,19 @@ public class pedidosController implements Initializable {
                     System.out.println("Buscando nos Pedidos de Entrada");
                     //query = "SELECT * FROM `Ordem_De_Pedido` WHERE `data_entrada` >= ? AND `data_entrada` <= ?";
                     query = "SELECT * FROM `Pedidos` WHERE `status_id` =? AND `data_entrada` BETWEEN ?  AND ? ";
-                    listaPedidosEntrada = recuperarPedidosPorData(query, "1");
+                    listaPedidosEntrada = db_crud.recuperarPedidosPorData(query, "1", dataInicial, dataFinal, checkBoxDatas.isSelected(), cb_selectedIndex);
                     tableView.setItems(listaPedidosEntrada);
                     break;
                 case 1:
                     System.out.println("Buscando nos Pedidos em Triagem");
                     query = "SELECT * FROM `Pedidos` WHERE `status_id` =? AND `data_entrada` >= ? AND `data_entrada` <= ?";
-                    listaPedidosTriagem = recuperarPedidosPorData(query, "2");
+                    listaPedidosTriagem = db_crud.recuperarPedidosPorData(query, "2", dataInicial, dataFinal, checkBoxDatas.isSelected(), cb_selectedIndex);
                     tableView.setItems(listaPedidosTriagem);
                     break;
                 case 2:
                     System.out.println("Buscando nos Pedidos Finalizados");
                     query = "SELECT * FROM `Pedidos` WHERE `status_id` =? AND `data_entrada` >= ? AND `data_entrada` <= ?";
-                    listaPedidosFinalizado = recuperarPedidosPorData(query, "3");
+                    listaPedidosFinalizado = db_crud.recuperarPedidosPorData(query, "3", dataInicial, dataFinal, checkBoxDatas.isSelected(), cb_selectedIndex);
                     tableView.setItems(listaPedidosFinalizado);
                     break;
                 case 3:
@@ -401,7 +350,7 @@ public class pedidosController implements Initializable {
                     System.out.println("Buscando em todos os status");
                     int size = listaComboBox.size();
                     query = "SELECT * FROM `Pedidos` WHERE `data_entrada` >= ? AND `data_entrada` <= ?";
-                    listaPedidosTodos = recuperarPedidosPorData(query, "");
+                    listaPedidosTodos = db_crud.recuperarPedidosPorData(query, "", dataInicial, dataFinal, checkBoxDatas.isSelected(), cb_selectedIndex);
                     tableView.setItems(listaPedidosTodos);
 
             }
@@ -411,26 +360,26 @@ public class pedidosController implements Initializable {
                     System.out.println("Buscando nos Pedidos de Entrada");
                     //query = "SELECT * FROM `Ordem_De_Pedido` WHERE `data_entrada` >= ? AND `data_entrada` <= ?";
                     query = "SELECT * FROM `Pedidos` WHERE `status_id` =? ";
-                    listaPedidosEntrada = recuperarPedidosPorData(query, "1");
+                    listaPedidosEntrada = db_crud.recuperarPedidosPorData(query, "1", dataInicial, dataFinal, checkBoxDatas.isSelected(), cb_selectedIndex);
                     tableView.setItems(listaPedidosEntrada);
                     break;
                 case 1:
                     System.out.println("Buscando nos Pedidos em Triagem");
                     query = "SELECT * FROM `Pedidos` WHERE `status_id` =?";
-                    listaPedidosTriagem = recuperarPedidosPorData(query, "2");
+                    listaPedidosTriagem = db_crud.recuperarPedidosPorData(query, "2", dataInicial, dataFinal, checkBoxDatas.isSelected(), cb_selectedIndex);
                     tableView.setItems(listaPedidosTriagem);
                     break;
                 case 2:
                     System.out.println("Buscando nos Pedidos Finalizados");
                     query = "SELECT * FROM `Pedidos` WHERE `status_id` =?";
-                    listaPedidosFinalizado = recuperarPedidosPorData(query, "3");
+                    listaPedidosFinalizado = db_crud.recuperarPedidosPorData(query, "3", dataInicial, dataFinal, checkBoxDatas.isSelected(), cb_selectedIndex);
                     tableView.setItems(listaPedidosFinalizado);
                     break;
                 case 3:
                     listaPedidosTodos.clear();
                     System.out.println("Buscando em todos os status");
                     query = "SELECT * FROM `Pedidos`";
-                    listaPedidosTodos = recuperarPedidosPorData(query, "");
+                    listaPedidosTodos = db_crud.recuperarPedidosPorData(query, "", dataInicial, dataFinal, checkBoxDatas.isSelected(), cb_selectedIndex);
                                 tableView.setItems(listaPedidosTodos);
                                         break;
                     }
@@ -473,7 +422,7 @@ public class pedidosController implements Initializable {
             // Adcionando o nome da aba
             WritableSheet aba = planilha.createSheet("Lista de Produtos", 0);
             //Cabeçalhos
-            String cabecalho[] = new String[9];
+            String cabecalho[] = new String[10];
             cabecalho[0] = "ID:";
             cabecalho[1] = "Nome do Cliente:";
             cabecalho[2] = "Endereco do Cliente:";
@@ -482,7 +431,8 @@ public class pedidosController implements Initializable {
             cabecalho[5] = "H. Entrada";
             cabecalho[6] = "H. Triagem";
             cabecalho[7] = "H. Checkout";
-            cabecalho[8] = "H. Finaliz.";
+            cabecalho[8] = "H. Saida";
+            cabecalho[9] = "H. Finaliz.";
 
             // Cor de fundo das celular
             Colour bckColor = Colour.DARK_BLUE2;
@@ -490,7 +440,7 @@ public class pedidosController implements Initializable {
             cellFormat.setBackground(bckColor);
             // Cor e tipo de Fonte
             WritableFont fonte = new WritableFont(WritableFont.ARIAL);
-            fonte.setColour(Colour.GOLD);
+            fonte.setColour(Colour.WHITE);
             cellFormat.setFont(fonte);
 
             // escrever o Header para o xls
@@ -523,7 +473,9 @@ public class pedidosController implements Initializable {
                 aba.addCell(label);
                 label = new Label(7, linha, listaTabela.get(linha- 1).getHorario_checkout());
                 aba.addCell(label);
-                label = new Label(8, linha, listaTabela.get(linha- 1).getHorario_finalizado());
+                label = new Label(8, linha, listaTabela.get(linha- 1).getHorario_saidaentrega());
+                aba.addCell(label);
+                label = new Label(9, linha, listaTabela.get(linha- 1).getHorario_finalizado());
                 aba.addCell(label);
             }
 
@@ -556,8 +508,6 @@ public class pedidosController implements Initializable {
                     return true;
                 }else if(pedido.getForma_envio().toUpperCase().indexOf(upperCaseFilter) != -1)
                     return true;
-                else if(pedido.getForma_subst().toUpperCase().indexOf(upperCaseFilter) != -1)
-                return true;
                 else
                     return false;
             });

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import com.jfoenix.controls.JFXDatePicker?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXTimePicker?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<StackPane fx:id="stackPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="548.0" prefWidth="810.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.novoPedidoController">
+   <children>
+      <BorderPane prefHeight="200.0" prefWidth="200.0">
+         <top>
+            <VBox alignment="CENTER" />
+         </top>
+         <center>
+            <VBox alignment="TOP_CENTER" prefHeight="260.0" prefWidth="790.0" spacing="5.0" style="-fx-border-color: NAVY; -fx-border-radius: 15; -fx-border-width: 2.5;" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox alignment="CENTER" spacing="5.0">
+                     <children>
+                        <VBox prefHeight="69.0" prefWidth="732.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="NOME DO CLIENTE">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXTextField fx:id="edtNome" labelFloat="true" prefHeight="40.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                        <JFXButton fx:id="btnClientePesquisa" alignment="CENTER" contentDisplay="CENTER" prefHeight="40.0" prefWidth="41.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" text=" " textAlignment="CENTER">
+                           <font>
+                              <Font size="1.0" />
+                           </font>
+                           <graphic>
+                              <FontAwesomeIconView glyphName="SEARCH" size="25" wrappingWidth="23.66668701171875" />
+                           </graphic>
+                        </JFXButton>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="59.0" prefWidth="774.0" spacing="5.0">
+                     <children>
+                        <VBox prefHeight="156.0" prefWidth="563.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="ENDEREÇO DO CLIENTE">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXTextField fx:id="edtEndereco" labelFloat="true" prefHeight="37.0" prefWidth="557.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="54.0" prefWidth="251.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="BAIRRO">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXTextField fx:id="edtBairro" labelFloat="true" prefHeight="37.0" prefWidth="557.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="43.0" prefWidth="218.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="TELEFONE DO CLIENTE">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXTextField fx:id="edtTel" labelFloat="true" prefHeight="40.0" prefWidth="225.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="67.0" prefWidth="827.0" spacing="5.0">
+                     <children>
+                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="189.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="FORMA DE PAGAMENTO">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXTextField fx:id="edtFormaPagamento" labelFloat="true" prefHeight="40.0" prefWidth="237.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="157.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="FORMA DE ENVIO">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXTextField fx:id="edtFormaEnvio" labelFloat="true" prefHeight="40.0" prefWidth="117.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="171.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="EM CASO DE FALTA">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXTextField fx:id="edtCasoFalta" labelFloat="true" prefHeight="40.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="81.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="TROCO">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXTextField fx:id="edtTroco" labelFloat="true" prefHeight="40.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="160.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="ORIGEM">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXTextField fx:id="edtFonte" labelFloat="true" prefHeight="40.0" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" />
+                     </padding>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="132.0" prefWidth="774.0" spacing="5.0">
+                     <children>
+                        <VBox alignment="TOP_CENTER" prefHeight="20.0" prefWidth="774.0" spacing="10.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="INSERÇÃO MANUAL">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXCheckBox fx:id="checkBoxManual" text="FAZER LANÇAMENTO DE PEDIDO MANUAL" />
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="62.0" prefWidth="859.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-background-color: WHITE;" text="OBSERVAÇÃO">
+                                 <effect>
+                                    <DropShadow color="#0000001e" />
+                                 </effect>
+                              </Text>
+                              <JFXTextArea fx:id="edtObservacao" prefHeight="114.0" prefWidth="452.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" />
+                     </padding>
+                  </HBox>
+                  <HBox fx:id="hboxManual" alignment="CENTER_LEFT" prefHeight="91.0" prefWidth="774.0" spacing="5.0" visible="false">
+                     <children>
+                        <VBox alignment="TOP_CENTER" prefHeight="62.0" prefWidth="189.0" spacing="5.0">
+                           <children>
+                              <JFXDatePicker fx:id="datePickerEntrada" prefHeight="40.0" promptText="DATA ENTRADA" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
+                              <JFXTimePicker fx:id="timePickerEntrada" prefHeight="40.0" promptText="H. ENTRADA" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="82.0" prefWidth="182.0" spacing="5.0">
+                           <children>
+                              <JFXTimePicker fx:id="timePickerTriagem" prefHeight="40.0" promptText="H. TRIAGEM" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
+                              <JFXTimePicker fx:id="timePickerCheckout" prefHeight="40.0" promptText="H. CHECKOUT" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="82.0" prefWidth="183.0" spacing="5.0">
+                           <children>
+                              <JFXTimePicker fx:id="timePickerSaida" prefHeight="40.0" promptText="H. SAIDA ENTREGA" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
+                              <JFXTimePicker fx:id="timePickerFinalizado" prefHeight="40.0" promptText="H. FINALIZADO" style="-fx-border-radius: 15; -fx-border-color: BLACK; -fx-background-color: WHITE;" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="82.0" prefWidth="175.0" spacing="5.0">
+                           <children>
+                              <JFXTextField fx:id="edtCaixa" labelFloat="true" prefHeight="40.0" promptText="CAIXA RESPONSAVEL" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                              <JFXTextField fx:id="edtEntregador" labelFloat="true" prefHeight="40.0" promptText="ENTREGADOR RESPONSAVEL" style="-fx-background-color: WHITE; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" />
+                     </padding>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </VBox>
+         </center>
+         <bottom>
+            <HBox alignment="CENTER" prefHeight="81.0" prefWidth="790.0" spacing="15.0" BorderPane.alignment="CENTER">
+               <children>
+                  <JFXButton fx:id="btnSalvar" prefHeight="40.0" prefWidth="90.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" text="SALVAR" textAlignment="CENTER" />
+                  <JFXButton fx:id="btnCancelar" prefHeight="40.0" prefWidth="90.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: black; -fx-border-radius: 15;" text="CANCELAR" textAlignment="CENTER" />
+               </children>
+            </HBox>
+         </bottom>
+      </BorderPane>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</StackPane>

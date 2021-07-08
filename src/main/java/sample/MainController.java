@@ -1,33 +1,39 @@
 package sample;
 
+import com.aspose.pdf.Document;
+import com.aspose.pdf.Image;
+import com.aspose.pdf.MarginInfo;
+import com.aspose.pdf.Page;
 import com.jfoenix.controls.*;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import helpers.*;
+import helpers.Database.db_connect;
+import helpers.Database.db_crud;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -35,8 +41,8 @@ import javafx.stage.WindowEvent;
 import models.OrdemPedido;
 import models.Usuario;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
+import javax.imageio.ImageIO;
+import java.io.*;
 import java.net.URL;
 import java.sql.*;
 import java.text.ParseException;
@@ -187,7 +193,6 @@ public class MainController implements Initializable {
         connection = db_connect.getConnect();
 
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        // idCol.setSortType(TableColumn.SortType.DESCENDING);
         nomeCol.setCellValueFactory(new PropertyValueFactory<>("cliente_nome"));
         telCol.setCellValueFactory(new PropertyValueFactory<>("num_cliente"));
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
@@ -205,27 +210,7 @@ public class MainController implements Initializable {
         refreshTable();
     }
     private void setupComponentes(){
-        /*
-        btnSample.setOnAction((e)->{
-            try {
-                Parent parent = FXMLLoader.load(getClass().getResource("/SampleScreen.fxml"));
-                Scene scene = new Scene(parent);
-                Stage stage = new Stage();
-                stage.setScene(scene);
-                stage.initStyle(StageStyle.UTILITY);
-                stage.show();
-                stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                    @Override
-                    public void handle(WindowEvent event) {
-                        refreshTable();
-                        System.out.println("Janela fechada");
-                    }
-                });
-            } catch (IOException exception){
-                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, exception);
-            }
-        });
-         */
+
         stackPane.setOnMousePressed(pressEvent -> {
             stackPane.setOnMouseDragged(dragEvent -> {
                 System.out.println("Movendo a Janela");
@@ -236,7 +221,6 @@ public class MainController implements Initializable {
         });
         btnExit.setOnAction((e) -> {
             Stage stage = (Stage) stackPane.getScene().getWindow();
-            // do what you have to do
             stage.close();
         });
         btnRefresh.setOnAction((e) -> {
@@ -315,16 +299,6 @@ public class MainController implements Initializable {
                     selectedTable = 1;
                     System.out.println(ordem.getId());
                     System.out.println(selectedTable);
-                    //Seleção de celula independente
-                    /*
-                    ObservableList selectedCells = selectionModel.getSelectedCells();
-                    TablePosition tablePosition = (TablePosition) selectedCells.get(0);
-                    Object val = tablePosition.getTableColumn().getCellData(newValue);
-                    selectedIndex = val.toString();
-                    System.out.println("Selected Value" + val);
-                    */
-
-
                 }
             }
         });
@@ -427,26 +401,35 @@ public class MainController implements Initializable {
         ArrayList<String> array = new ArrayList<>();
         ArrayList<String> array2 = new ArrayList<>();
 
-        JFXComboBox<String> cbPeriodoPedidoDiario = setupComboBox();
-        JFXComboBox<String> cbPeriodoHorarioPico = setupComboBox();
+        int tempoDeBusca = 14;
 
         nowOnDate();
 
         //Componentes
         ScrollPane scrollPane = new ScrollPane();
 
+        JFXButton btnPrint = defaultButton("Imprimir Dashboard");
+
 
         Text textPedidoPeriodo = defaultText("Pedidos Por Dia");
-        Text textHorarioPico = defaultText("H.P Por Dia");
-        Text textMediaTempoTriagem = defaultText("M.T Por Dia");
-        Text textMTE = defaultText("M.E Por Dia");
+        Text textHorarioPico = defaultText("Horarios de Pico");
+        Text textMediaTempoTriagem = defaultText("Media de Listagem por Dia");
+        Text textMTE = defaultText("Media de Entrega por dia");
         Text totalText = defaultText("Total:");
         Text numTotalText = defaultText("");
 
         Text textcard1 = defaultText("Total de Pedidos");
-        Text textcard2 = defaultText("M.P p/Cliente");
-        Text textcard3 = defaultText("M.T Total");
-        Text textcard4 = defaultText("M.E Total");
+        Text textcard2 = defaultText("Média de Pedidos/Cliente");
+        Text textcard3 = defaultText("Média de Listagem");
+        Text textcard4 = defaultText("Média de Entrega");
+
+        Text textPie1 = defaultText("Fonte do Pedido");
+        Text textPie2 = defaultText("Formas de Pagamento");
+        Text textPie3 = defaultText("Relação Caixa/Checkout");
+        Text textPie4 = defaultText("Clientes/Bairro");
+
+
+
 
         Text valuecard1 = defaultText("--,--");
         Text bottomCard1 = defaultText("PEDIDOS");
@@ -473,8 +456,28 @@ public class MainController implements Initializable {
         LineChart<String, Number> lineChartMTE = lineChart();
         XYChart.Series seriesMTE = new XYChart.Series();
         lineChartMTE.getData().add(seriesMTE);
+
+        //test
+        LineChart<String, Number> lcClienteBairro = lineChart();
+        lcClienteBairro.setPrefHeight(700);
+        XYChart.Series sClienteBairro = new XYChart.Series();
+        lcClienteBairro.getData().add(sClienteBairro);
+        //test
+
         //LineChart
 
+        //PieChart
+        PieChart pieChartOrigem = new PieChart();
+        PieChart pieChartPagamento = new PieChart();
+        PieChart pieChartCaixaCheckout = new PieChart();
+        PieChart pieChartClienteBairro = new PieChart();
+        PieChart pieChartEntrega = new PieChart();
+        PieChart pieChartSubst = new PieChart();
+
+        //PieChart
+
+        HBox rowTop = new HBox();
+        rowTop.getChildren().addAll(btnPrint);
 
         HBox row1 = new HBox();
         row1.setAlignment(Pos.CENTER);
@@ -483,25 +486,36 @@ public class MainController implements Initializable {
         row2.setAlignment(Pos.CENTER);
         HBox row3 = new HBox();
         row3.setAlignment(Pos.CENTER);
+        HBox row4 = new HBox();
+        row4.setSpacing(40);
+        row4.setAlignment(Pos.CENTER);
+
+        HBox row5 = new HBox();
+        row5.setSpacing(40);
+        row5.setAlignment(Pos.CENTER);
+
+        HBox row6 = new HBox();
+        row6.setSpacing(40);
+        row6.setAlignment(Pos.CENTER);
 
         VBox card1 = card();
-        card1.getChildren().addAll(textcard1, DefaultComponents.FontIcon("FILE"), valuecard1, bottomCard1);
+        card1.getChildren().addAll(textcard1, FontIcon("FILE"), valuecard1, bottomCard1);
         VBox card2 = card();
-        card2.getChildren().addAll(textcard2, DefaultComponents.FontIcon("USER_PLUS"), valuecard2, bottomCard2);
+        card2.getChildren().addAll(textcard2, FontIcon("USER_PLUS"), valuecard2, bottomCard2);
         VBox card3 = card();
-        card3.getChildren().addAll(textcard3, DefaultComponents.FontIcon("SHOPPING_CART"), valuecard3, bottomCard3);
+        card3.getChildren().addAll(textcard3, FontIcon("SHOPPING_CART"), valuecard3, bottomCard3);
         VBox card4 = card();
-        card4.getChildren().addAll(textcard4, DefaultComponents.FontIcon("MOTORCYCLE"), valuecard4, bottomCard4);
+        card4.getChildren().addAll(textcard4, FontIcon("MOTORCYCLE"), valuecard4, bottomCard4);
 
         VBox cardChart1 = card();
         cardChart1.setPrefWidth(500);
         cardChart1.setPrefHeight(400);
-        cardChart1.getChildren().addAll(textPedidoPeriodo, cbPeriodoPedidoDiario, lineChartPedidosDiarios);
+        cardChart1.getChildren().addAll(textPedidoPeriodo, lineChartPedidosDiarios);
 
         VBox cardChart2 = card();
         cardChart2.setPrefWidth(500);
         cardChart2.setPrefHeight(400);
-        cardChart2.getChildren().addAll(textHorarioPico, cbPeriodoHorarioPico, lineChartHorariosPico);
+        cardChart2.getChildren().addAll(textHorarioPico, lineChartHorariosPico);
 
         VBox cardChart3 = card();
         cardChart3.setPrefWidth(500);
@@ -513,34 +527,63 @@ public class MainController implements Initializable {
         cardChart4.setPrefHeight(400);
         cardChart4.getChildren().addAll(textMTE, lineChartMTE);
 
+
+        VBox cardPie1 = card();
+        cardPie1.setPrefWidth(500);
+        cardPie1.setPrefHeight(400);
+        cardPie1.getChildren().addAll(textPie1, pieChartOrigem);
+
+        VBox cardPie2 = card();
+        cardPie2.setPrefWidth(500);
+        cardPie2.setPrefHeight(400);
+        cardPie2.getChildren().addAll(textPie2, pieChartPagamento);
+
+        VBox cardPie3 = card();
+        cardPie3.setPrefWidth(500);
+        cardPie3.setPrefHeight(400);
+        cardPie3.getChildren().addAll(textPie3, pieChartCaixaCheckout);
+
+        /*
+        VBox cardPie4 = card();
+        cardPie4.setPrefWidth(500);
+        cardPie4.setPrefHeight(400);
+        cardPie4.getChildren().addAll(textPie4, pieChartClienteBairro);
+
+
+         */
+
+        //test
+        VBox cardPie4 = card();
+        cardPie4.setPrefWidth(1000);
+        cardPie4.setPrefHeight(800);
+        cardPie4.getChildren().addAll(textPie4, lcClienteBairro);
+        //test
+
+
         //Componentes
 
-
-        cbPeriodoPedidoDiario.valueProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                selectedPeriodo = cbPeriodoPedidoDiario.getSelectionModel().getSelectedIndex();
-                setupChartPedidosDiarios(dias, array, cbPeriodoPedidoDiario, seriesPedidosDiarios);
-                System.out.println(selectedPeriodo);
-
-            }
-        });
 
         row1.getChildren().addAll(card1, card2, card3, card4);
         row2.getChildren().addAll(cardChart1, cardChart2);
         row2.setSpacing(20);
         row3.getChildren().addAll(cardChart3, cardChart4);
         row3.setSpacing(20);
+        row4.getChildren().addAll(cardPie1, cardPie2);
+        row5.getChildren().addAll(cardPie3);
+
+        row6.getChildren().addAll(cardPie4);
+
+
         VBox vboxFinal = new VBox();
-        vboxFinal.getChildren().addAll(row1, row2, row3);
+        vboxFinal.getChildren().addAll(rowTop,row1, row2, row3, row4, row5, row6);
         vboxFinal.setPadding(new Insets(10,0,10,0));
         vboxFinal.setSpacing(40);
 
-        setupChartPedidosDiarios(dias, array, cbPeriodoPedidoDiario, seriesPedidosDiarios);
-        setupChartHorariosPico(array, cbPeriodoHorarioPico, seriesHorarioPico);
+        setupChartPedidosDiarios(tempoDeBusca, array, seriesPedidosDiarios);
+        setupChartHorariosPico(array, seriesHorarioPico);
 
         //setup chartline MT
-        ArrayList<String> listaDatasMT = getArrayDatas(7);
+        ArrayList<String> listaDatasMT = getArrayDatas(tempoDeBusca);
         ArrayList<Float> MTChartArray = recuperarMediaTempoListagem(listaDatasMT);
         seriesMediaTempoTriagem.getData().clear();
         for(int i = 0; i<MTChartArray.size(); i++){
@@ -549,7 +592,7 @@ public class MainController implements Initializable {
         //
 
         //setup chatline ME
-        ArrayList<String> listaDatasME = getArrayDatas(7);
+        ArrayList<String> listaDatasME = getArrayDatas(tempoDeBusca);
         ArrayList<Float> MTEChartArray = recuperarMEdata(listaDatasME);
         //System.out.println("MTECHARTARRAY SIZE: " + MTEChartArray);
         //System.out.println("MTESERIES SIZE: " + seriesMTE.hashCode());
@@ -558,9 +601,68 @@ public class MainController implements Initializable {
         for(int i = 0; i<MTEChartArray.size(); i++){
             seriesMTE.getData().add(new XYChart.Data<String, Number>(listaDatasME.get(i), MTEChartArray.get(i)));
            // System.out.println("MTESERIES SIZE: " + seriesMTE.hashCode());
+
+        }
+
+
+
+        //test
+        //setup lc ClienteBairro
+
+        ArrayList<String> nomeBairros = db_crud.getBairros();
+        ArrayList<Integer> qtdClientesBairros = new ArrayList<>();
+
+        Connection connection = db_connect.getConnect();
+
+        for(int b = 0; b< nomeBairros.size(); b++){
+
+            try{
+                ArrayList<Integer> listatemp = new ArrayList<>();
+
+                PreparedStatement ps = connection.prepareStatement("SELECT * FROM Clientes WHERE `bairro` = ?");
+                ps.setString(1, nomeBairros.get(b));
+                ResultSet r = ps.executeQuery();
+                while (r.next()){
+                    listatemp.add(r.getInt("id"));
+                }
+
+                qtdClientesBairros.add(listatemp.size());
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+
+
+        }
+
+        sClienteBairro.getData().clear();
+        for(int i = 0; i<qtdClientesBairros.size(); i++){
+            sClienteBairro.getData().add(new XYChart.Data<String, Number>(nomeBairros.get(i), qtdClientesBairros.get(i)));
         }
 
         //
+
+        //setup cardpie
+        System.out.println("Chart: Pie Origem - Configurando");
+            ObservableList<PieChart.Data> listOrigem = DataManagerAnalytcs.getOrigemData();
+                pieChartOrigem.setData(listOrigem);
+
+        System.out.println("Chart: Pie Pagamento - Configurando");
+        ObservableList<PieChart.Data> listPagamento = DataManagerAnalytcs.getPagamentoData();
+                pieChartPagamento.setData(listPagamento);
+
+        System.out.println("Chart: Pie Caixa/Checkout - Configurando");
+        ObservableList<PieChart.Data> listaCaixaCheckout = DataManagerAnalytcs.getCaixaCheckout();
+                pieChartCaixaCheckout.setData(listaCaixaCheckout);
+
+                /*
+        System.out.println("Chart: Line Cliente/Bairro - Configurando");
+        ObservableList<PieChart.Data> listaClienteBairro = DataManagerAnalytcs.getClienteBairro();
+        pieChartClienteBairro.setData(listaClienteBairro);
+
+
+                 */
+        //
+
 
 
         valuecard1.setText(String.valueOf(DataManagerAnalytcs.getPedidostotal()));
@@ -574,7 +676,96 @@ public class MainController implements Initializable {
         scrollPane.setFitToWidth(true);
         scrollPane.setPadding(new Insets(20,20,20,20));
         dashBoard.setCenter(scrollPane);
+
+
+        btnPrint.setOnAction((e) -> {
+            ArrayList<Node> listaComponents = new ArrayList<>();
+            listaComponents.add(cardChart1);
+            listaComponents.add(cardChart2);
+            listaComponents.add(cardChart3);
+            listaComponents.add(cardChart4);
+            listaComponents.add(cardPie1);
+            listaComponents.add(cardPie2);
+            listaComponents.add(card1);
+            listaComponents.add(card2);
+            listaComponents.add(card3);
+            listaComponents.add(card4);
+            listaComponents.add(cardPie3);
+            //add componentes
+
+            try {
+                //VBox newVbox = vboxFinal;
+                nodesToImage(listaComponents);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        });
         //dashBoard.setPadding(new Insets(20,20,20,20));
+    }
+
+    private void metodoImprimir(ByteArrayInputStream bais) throws IOException {
+
+
+        Document doc = new Document();
+
+        Image image = new Image();
+
+        Page page = doc.getPages().add();
+        MarginInfo marginInfo = new MarginInfo();
+        marginInfo.setRight(25);
+        marginInfo.setLeft(25);
+        marginInfo.setTop(100);
+        marginInfo.setBottom(100);
+        page.getPageInfo().setMargin(marginInfo);
+        page.getParagraphs().add(image);
+        image.setImageStream(bais);
+        //210 mm by 297
+        File file = fileChooserSave(stackPane, "PDF", "*.pdf");
+        doc.save(file.getAbsolutePath());
+
+
+        configDashBoard(14);
+
+    }
+
+
+
+    private void nodesToImage (ArrayList<Node> Componentes) throws IOException {
+
+        VBox vBoxPrincipal = defaultVBox();
+        vBoxPrincipal.setSpacing(10);
+
+
+
+        HBox row1 = defaultHBox();
+        HBox row2 = defaultHBox();
+        HBox row3 = defaultHBox();
+        HBox row4 = defaultHBox();
+
+        row1.getChildren().addAll(Componentes.get(6), Componentes.get(7), Componentes.get(8), Componentes.get(9));
+        row2.getChildren().addAll(Componentes.get(0), Componentes.get(1), Componentes.get(2));
+        row3.getChildren().addAll(Componentes.get(3), Componentes.get(4), Componentes.get(5));
+        row4.getChildren().addAll(Componentes.get(10));
+
+        vBoxPrincipal.getChildren().addAll(row1, row2, row3, row4);
+
+
+        Scene scene = new Scene(new Group());
+
+
+        ((Group) scene.getRoot()).getChildren().add(vBoxPrincipal);
+
+        WritableImage image = scene.snapshot(null);
+        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+        ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", byteOutput);
+        //byteOutput.flush();
+        ByteArrayInputStream bais = new ByteArrayInputStream(byteOutput.toByteArray());
+
+
+
+        metodoImprimir(bais);
+
+        System.out.println("Image Saved");
     }
 
     private ArrayList<String> getArrayDatas(int dias){
@@ -593,6 +784,7 @@ public class MainController implements Initializable {
         for(int i = 0; i<dias; i++) {
             //ArrayList<PedidoEstatistica> innerEstatisticas = new ArrayList<>();
             //listaMediaTriagem
+            //
             try {
                 //query = "SELECT * FROM `Pedido_Estatisticas` WHERE `data` =?";
                 preparedStatement = connection.prepareStatement("SELECT AVG(`m.t`) FROM `Pedido_Estatisticas` WHERE `data` = ?");
@@ -644,10 +836,10 @@ public class MainController implements Initializable {
     }
 
 
-    private void setupChartPedidosDiarios(int dias, ArrayList<String> array, JFXComboBox<String> cbPeriodo, XYChart.Series series) {
+    private void setupChartPedidosDiarios(int dias, ArrayList<String> array, XYChart.Series series) {
         listaTotalData.clear();
         listaPedidoFiltrados.clear();
-        dias = getDias(dias, cbPeriodo);
+        //dias = getDias(dias, cbPeriodo);
         array = DataManagerAnalytcs.getDatasArray(dias, array, dataInicial);
         if (DataManagerAnalytcs.isFinished == true) {
             listaTotalData = DataManagerAnalytcs.getListaTotalData();
@@ -655,7 +847,7 @@ public class MainController implements Initializable {
         }
     }
 
-    private void setupChartHorariosPico(ArrayList<String> array, JFXComboBox<String> cbPeriodo, XYChart.Series series) {
+    private void setupChartHorariosPico(ArrayList<String> array, XYChart.Series series) {
         listaTotalData.clear();
         listaPedidoFiltrados.clear();
         int horasDoDia = 15;
@@ -733,9 +925,10 @@ public class MainController implements Initializable {
             while (resultSet.next()){
                 listaPedidoFiltrados.add(new OrdemPedido(
                         resultSet.getInt("id"),
-                        resultSet.getInt("id"),
+                        resultSet.getInt("cliente_id"),
                         resultSet.getString("cliente_nome"),
                         resultSet.getString("cliente_endereco"),
+                        resultSet.getString("bairro"),
                         resultSet.getString("cliente_telefone"),
                         resultSet.getString("forma_envio"),
                         resultSet.getString("forma_pagamento"),
@@ -772,6 +965,7 @@ public class MainController implements Initializable {
                         resultSet.getInt("id"),
                         resultSet.getString("cliente_nome"),
                         resultSet.getString("cliente_endereco"),
+                        resultSet.getString("bairro"),
                         resultSet.getString("cliente_telefone"),
                         resultSet.getString("forma_envio"),
                         resultSet.getString("forma_pagamento"),
@@ -861,7 +1055,6 @@ public class MainController implements Initializable {
             String query = "SELECT * FROM `Pedidos` WHERE `status_id` = ?";
             listaPedidos = db_crud.recuperarPedidosViaStatus(query,1);
                 tablePedido.setItems(listaPedidos);
-                //tablePedido.getColumns().addAll(idCol, nomeCol, telCol, statusCol);
                 tablePedido.getSortOrder().add(idCol);
         //
         //Recuperção triagem
@@ -870,7 +1063,6 @@ public class MainController implements Initializable {
             query = "SELECT * FROM `Pedidos` WHERE `status_id` =?";
             listaPedidosTriagem = db_crud.recuperarPedidosViaStatus(query, 2);
                 tablePedidoTriagem.setItems(listaPedidosTriagem);
-                //tablePedidoTriagem.getColumns().addAll(idColTriagem, nomeColTriagem, dataColTriagem, statusColTriagem);
                 tablePedidoTriagem.getSortOrder().add(idColTriagem);
         //Recuperção Finalizado
         //
@@ -878,7 +1070,6 @@ public class MainController implements Initializable {
             query = "SELECT * FROM `Pedidos` WHERE `status_id` =?";
             listaPedidosFinalizado = db_crud.recuperarPedidosViaStatus(query,3);
                 tablePedidoFinalizado.setItems(listaPedidosFinalizado);
-                //tablePedidoTriagem.getColumns().addAll(idColTriagem, nomeColTriagem, dataColTriagem, statusColTriagem);
                 tablePedidoFinalizado.getSortOrder().add(idColFinalizado);
 
     }

@@ -3,9 +3,9 @@ package models;
 public class OrdemPedido {
     int id;
     int cliente_id;
-    String cliente_nome, end_cliente, num_cliente, forma_envio,
-            forma_pagamento, forma_subst, data_entrada, horario_entrada,
-            horario_triagem, horario_checkout, horario_finalizado;
+    String cliente_nome, end_cliente, bairro, num_cliente, forma_envio,
+            forma_pagamento, data_entrada, horario_entrada,
+            horario_triagem, horario_checkout, horario_saidaentrega ,horario_finalizado;
     int operador_id;
     int entregador_id;
     String fonte_pedido;
@@ -14,25 +14,20 @@ public class OrdemPedido {
     String caixa_responsavel;
     int status_id;
 
-
-    public OrdemPedido(int id, int cliente_id, String cliente_nome, String end_cliente,
-                       String num_cliente, String forma_envio, String forma_pagamento,
-                       String forma_subst, String data_entrada, String horario_entrada,
-                       String horario_triagem, String horario_checkout, String horario_finalizado,
-                       int operador_id, int entregador_id, String fonte_pedido, String status, double troco,
-                        String caixa_responsavel, int status_id) {
+    public OrdemPedido(int id, int cliente_id, String cliente_nome, String end_cliente, String bairro, String num_cliente, String forma_envio, String forma_pagamento, String data_entrada, String horario_entrada, String horario_triagem, String horario_checkout, String horario_saidaentrega, String horario_finalizado, int operador_id, int entregador_id, String fonte_pedido, String status, double troco, String caixa_responsavel, int status_id) {
         this.id = id;
         this.cliente_id = cliente_id;
         this.cliente_nome = cliente_nome;
         this.end_cliente = end_cliente;
+        this.bairro = bairro;
         this.num_cliente = num_cliente;
         this.forma_envio = forma_envio;
         this.forma_pagamento = forma_pagamento;
-        this.forma_subst = forma_subst;
         this.data_entrada = data_entrada;
         this.horario_entrada = horario_entrada;
         this.horario_triagem = horario_triagem;
         this.horario_checkout = horario_checkout;
+        this.horario_saidaentrega = horario_saidaentrega;
         this.horario_finalizado = horario_finalizado;
         this.operador_id = operador_id;
         this.entregador_id = entregador_id;
@@ -43,20 +38,12 @@ public class OrdemPedido {
         this.status_id = status_id;
     }
 
-    public String getCaixa_responsavel() {
-        return caixa_responsavel;
+    public String getHorario_saidaentrega() {
+        return horario_saidaentrega;
     }
 
-    public int getStatus_id() {
-        return status_id;
-    }
-
-    public void setStatus_id(int status_id) {
-        this.status_id = status_id;
-    }
-
-    public void setCaixa_responsavel(String caixa_responsavel) {
-        this.caixa_responsavel = caixa_responsavel;
+    public void setHorario_saidaentrega(String horario_saidaentrega) {
+        this.horario_saidaentrega = horario_saidaentrega;
     }
 
     public int getId() {
@@ -91,6 +78,14 @@ public class OrdemPedido {
         this.end_cliente = end_cliente;
     }
 
+    public String getBairro() {
+        return bairro;
+    }
+
+    public void setBairro(String bairro) {
+        this.bairro = bairro;
+    }
+
     public String getNum_cliente() {
         return num_cliente;
     }
@@ -115,13 +110,6 @@ public class OrdemPedido {
         this.forma_pagamento = forma_pagamento;
     }
 
-    public String getForma_subst() {
-        return forma_subst;
-    }
-
-    public void setForma_subst(String forma_subst) {
-        this.forma_subst = forma_subst;
-    }
 
     public String getData_entrada() {
         return data_entrada;
@@ -201,5 +189,21 @@ public class OrdemPedido {
 
     public void setTroco(double troco) {
         this.troco = troco;
+    }
+
+    public String getCaixa_responsavel() {
+        return caixa_responsavel;
+    }
+
+    public void setCaixa_responsavel(String caixa_responsavel) {
+        this.caixa_responsavel = caixa_responsavel;
+    }
+
+    public int getStatus_id() {
+        return status_id;
+    }
+
+    public void setStatus_id(int status_id) {
+        this.status_id = status_id;
     }
 }

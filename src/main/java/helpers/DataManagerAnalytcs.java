@@ -1,7 +1,10 @@
 package helpers;
 
+import helpers.Database.db_connect;
+import helpers.Database.db_crud;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.chart.PieChart;
 import models.OrdemPedido;
 
 import java.sql.*;
@@ -138,6 +141,7 @@ public class DataManagerAnalytcs {
                             resultSet.getInt("cliente_id"),
                             resultSet.getString("cliente_nome"),
                             resultSet.getString("cliente_endereco"),
+                            resultSet.getString("bairro"),
                             resultSet.getString("cliente_telefone"),
                             resultSet.getString("forma_envio"),
                             resultSet.getString("forma_pagamento"),
@@ -331,6 +335,273 @@ public class DataManagerAnalytcs {
 
         return value;
     }
+    public static int getEntregadorME(int id){
+        int value = 0;
+
+        try {
+            String q = "SELECT  AVG (`m.e`) FROM `Pedido_Estatisticas` WHERE `id`";
+            Connection conn = db_connect.getConnect();
+            PreparedStatement p = conn.prepareStatement(q);
+            ResultSet r = p.executeQuery();
+            while (r.next()) {
+
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+
+        return value;
+    }
+    public static int getPedidosPCaixa (String caixaNome){
+        int value = 0;
+        try {
+            Connection connection = db_connect.getConnect();
+            String query = "SELECT COUNT(*) AS rowcount FROM Pedidos WHERE caixa_responsavel = ?";
+            PreparedStatement s = connection.prepareStatement(query);
+            preparedStatement.setString(1, caixaNome);
+            ResultSet r = s.executeQuery();
+            r.next();
+            value= r.getInt("rowcount");
+            r.close();
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return value;
+    }
+
+
+
+    public static ObservableList<PieChart.Data> getOrigemData (){
+        int whatsapp = 0;
+        int ligacao = 0;
+        int outros = 0;
+
+        try{
+            Connection connection = db_connect.getConnect();
+
+            PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) AS rowcount FROM Pedidos WHERE `fonte_pedido` = ?");
+            ps.setString(1, "WHATSAPP");
+            ResultSet r = ps.executeQuery();
+            r.next();
+            whatsapp = r.getInt("rowcount");
+            r.close();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+
+
+        try{
+            Connection connection = db_connect.getConnect();
+
+            PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) AS rowcount FROM Pedidos WHERE `fonte_pedido` = ?");
+            ps.setString(1, "LIGACAO");
+            ResultSet r = ps.executeQuery();
+            r.next();
+            ligacao = r.getInt("rowcount");
+            r.close();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        try{
+            Connection connection = db_connect.getConnect();
+
+            PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) AS rowcount FROM Pedidos WHERE `fonte_pedido` = ?");
+            ps.setString(1, "OUTROS");
+            ResultSet r = ps.executeQuery();
+            r.next();
+            outros = r.getInt("rowcount");
+            r.close();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+
+
+        ObservableList<PieChart.Data> list = FXCollections.observableArrayList(
+                new PieChart.Data("Whatsapp", whatsapp),
+                new PieChart.Data("Telefone", ligacao),
+                new PieChart.Data("Outros", outros)
+        );
+
+        System.out.println("Pedidos do Whatsapp: " + whatsapp);
+        System.out.println("Pedidos do Telefone: " + ligacao);
+        System.out.println("Pedidos do Outros: " + outros);
+
+
+        return list;
+    }
+    public static ObservableList<PieChart.Data> getPagamentoData (){
+        int dinheiro = 0;
+        int debito = 0;
+        int credito = 0;
+        int aprazo = 0;
+
+        try{
+            ArrayList<Integer> listatemp = new ArrayList<>();
+            Connection connection = db_connect.getConnect();
+
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM Pedidos WHERE `forma_pagamento` = ?");
+            ps.setString(1, "DINHEIRO");
+            ResultSet r = ps.executeQuery();
+            while (r.next()){
+                listatemp.add(r.getInt("id"));
+            }
+
+            dinheiro = listatemp.size();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+
+
+        try{
+            ArrayList<Integer> listatemp = new ArrayList<>();
+            Connection connection = db_connect.getConnect();
+
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM Pedidos WHERE `forma_pagamento` = ?");
+            ps.setString(1, "CREDITO");
+            ResultSet r = ps.executeQuery();
+            while (r.next()){
+                listatemp.add(r.getInt("id"));
+            }
+
+            credito = listatemp.size();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }try{
+            ArrayList<Integer> listatemp = new ArrayList<>();
+            Connection connection = db_connect.getConnect();
+
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM Pedidos WHERE `forma_pagamento` = ?");
+            ps.setString(1, "DEBITO");
+            ResultSet r = ps.executeQuery();
+            while (r.next()){
+                listatemp.add(r.getInt("id"));
+            }
+
+            debito = listatemp.size();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }try{
+            ArrayList<Integer> listatemp = new ArrayList<>();
+            Connection connection = db_connect.getConnect();
+
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM Pedidos WHERE `forma_pagamento` = ?");
+            ps.setString(1, "A PRAZO");
+            ResultSet r = ps.executeQuery();
+            while (r.next()){
+                listatemp.add(r.getInt("id"));
+            }
+
+            aprazo = listatemp.size();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+
+        ObservableList<PieChart.Data> list = FXCollections.observableArrayList(
+                new PieChart.Data("Dinheiro", dinheiro),
+                new PieChart.Data("Debito", debito),
+                new PieChart.Data("Credito", credito),
+                new PieChart.Data("A Prazo", aprazo)
+        );
+
+        System.out.println("Pedidos Dinheiro " + dinheiro);
+        System.out.println("Pedidos Debito " + debito);
+        System.out.println("Pedidos Credito " + credito);
+        System.out.println("Pedidos a prazo");
+
+
+        return list;
+    }
+    public static ObservableList<PieChart.Data> getCaixaCheckout (){
+        ArrayList<String> listaNomes = db_crud.getCaixas();
+        System.out.println("Nomes de Caixas:" + listaNomes + "Size: " + listaNomes.size());
+        ArrayList<Integer> listaValores = new ArrayList<>();
+        Connection connection = db_connect.getConnect();
+
+        for(int i = 0; i< listaNomes.size(); i++){
+
+            try{
+                ArrayList<Integer> listatemp = new ArrayList<>();
+
+                PreparedStatement ps = connection.prepareStatement("SELECT * FROM Pedidos WHERE `caixa_responsavel` = ?");
+                ps.setString(1, listaNomes.get(i));
+                ResultSet r = ps.executeQuery();
+                while (r.next()){
+                    listatemp.add(r.getInt("id"));
+                }
+
+                listaValores.add(listatemp.size());
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+
+
+        }
+        System.out.println("Lista de Valores: " + listaValores + "Size: " + listaValores.size());
+
+        ObservableList<PieChart.Data> list = FXCollections.observableArrayList();
+
+        if(listaValores.size() == listaNomes.size()){
+            for(int i = 0; i<listaValores.size(); i++ ){
+                list.add(new PieChart.Data(listaNomes.get(i), listaValores.get(i)));
+            }
+        }else{
+            System.out.println("Valores Incompativeis");
+        }
+
+
+        return list;
+    }
+    public static ObservableList<PieChart.Data> getClienteBairro (){
+        ArrayList<String> listaBairros = db_crud.getBairros();
+        //System.out.println("Nomes dos Bairros:" + listaNomes + "Size: " + listaNomes.size());
+        ArrayList<Integer> listaValores = new ArrayList<>();
+        Connection connection = db_connect.getConnect();
+
+        for(int i = 0; i< listaBairros.size(); i++){
+
+            try{
+                ArrayList<Integer> listatemp = new ArrayList<>();
+
+                PreparedStatement ps = connection.prepareStatement("SELECT * FROM Clientes WHERE `bairro` = ?");
+                ps.setString(1, listaBairros.get(i));
+                ResultSet r = ps.executeQuery();
+                while (r.next()){
+                    listatemp.add(r.getInt("id"));
+                }
+
+                listaValores.add(listatemp.size());
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+
+
+        }
+        System.out.println("Lista de Valores: " + listaValores + "Size: " + listaValores.size());
+
+        ObservableList<PieChart.Data> list = FXCollections.observableArrayList();
+
+        if(listaValores.size() == listaBairros.size()){
+            for(int i = 0; i<listaValores.size(); i++ ){
+                list.add(new PieChart.Data(listaBairros.get(i), listaValores.get(i)));
+            }
+        }else{
+            System.out.println("Valores Incompativeis");
+        }
+
+
+        return list;
+    }
+
+
+
+
 
 
 

@@ -4,7 +4,7 @@ import com.jfoenix.controls.*;
 import helpers.AlertDialogModel;
 import helpers.AuthenticationSystem;
 import helpers.StringUtil;
-import helpers.db_connect;
+import helpers.Database.db_connect;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -24,7 +24,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import models.Cliente;
 import models.OrdemPedido;
 import models.Usuario;
 

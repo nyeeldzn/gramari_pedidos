@@ -13,10 +13,12 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="fontawesomefx-8.9" level="project" />
     <orderEntry type="library" name="iText7-Core-7.1" level="project" />
+    <orderEntry type="library" name="jexcelapi" level="project" />
+    <orderEntry type="library" name="Maven: com.aspose:aspose-pdf:21.2" level="project" />
     <orderEntry type="library" name="Maven: com.jfoenix:jfoenix:8.0.10" level="project" />
     <orderEntry type="library" name="Maven: com.itextpdf:itextpdf:5.5.13" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:8.0.23" level="project" />
     <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:3.11.4" level="project" />
-    <orderEntry type="library" name="jexcelapi" level="project" />
+    <orderEntry type="library" name="pdfbox-app-3.0.0-RC1" level="project" />
   </component>
 </module>
